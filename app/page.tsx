@@ -6,11 +6,27 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 type AnswerType = 'yes' | 'ofcourse' | 'annoying' | 'no' | null;
 
-const responses: Record<NonNullable<AnswerType>, { emoji: string; message: string }> = {
-  yes:      { emoji: '☕',  message: "Yay! Coffee time!" },
-  ofcourse: { emoji: '✨',  message: "OBVIOUSLY!" },
-  annoying: { emoji: '😤',  message: "I'll take it as a compliment" },
-  no:       { emoji: '😏',  message: "Nice try. You literally can't say no to coffee." },
+const responses: Record<NonNullable<AnswerType>, { emoji: string; message: string, image: string }> = {
+  yes:      { 
+    emoji: '☕',
+    message: "Yay! Coffee time!" ,
+    image: '/images/yes.png',
+  },
+  ofcourse: {
+    emoji: '✨', 
+    message: "OBVIOUSLY!",
+    image: '/images/hahadoggy.png',
+  },
+  annoying: { 
+    emoji: '😤',
+    message: "I'll take it as a compliment",
+    image: '/images/oops.png',
+  },
+  no:{ 
+    emoji: '😏', 
+    message: "Nice try. You literally can't say no to coffee.",
+    image: '/images/no.png',
+    },
 };
 
 export default function Home() {
@@ -46,7 +62,7 @@ export default function Home() {
   if (!ans) return;
   setAnswer(ans);  // show response immediately
   console.log(ans);
-  saveToFirebase(ans).catch((e) => console.error('❌ Firebase error:', e));
+  saveToFirebase(ans).catch((e) => console.error('Firebase error:', e));
     };
 
 // Runaway logic for the "No" button - flies off the screen
@@ -62,25 +78,36 @@ export default function Home() {
   //   btn.style.zIndex   = '9999';
   // }, []);
 
-// button to stay visible on the screen
+// button to stay visible on the screen append to the child 
+
 const runAway = useCallback(() => {
   const btn = noRef.current;
   if (!btn) return;
 
+  // Move to body so position:fixed is always relative to the viewport
+  if (btn.parentElement !== document.body) {
+    document.body.appendChild(btn);
+  }
+
+  btn.style.position = 'fixed';
+  btn.style.zIndex   = '9999';
+  btn.style.margin   = '0'; // kill any inherited margin
+
+  const PADDING  = 20;
   const btnWidth  = btn.offsetWidth;
   const btnHeight = btn.offsetHeight;
 
-  const maxX = window.innerWidth  - btnWidth  - 20; // 20px padding from edge
-  const maxY = window.innerHeight - btnHeight - 20; // 20px padding from edge
+  const maxX = window.innerWidth  - btnWidth  - PADDING;
+  const maxY = window.innerHeight - btnHeight - PADDING;
 
-  const randomX = Math.max(20, Math.random() * maxX);
-  const randomY = Math.max(20, Math.random() * maxY);
+  // Clamp both axes so it can never go off-screen
+  const randomX = Math.floor(Math.random() * maxX);
+  const randomY = Math.floor(Math.random() * maxY);
 
-  btn.style.position = 'fixed';
-  btn.style.left     = `${randomX}px`;
-  btn.style.top      = `${randomY}px`;
-  btn.style.zIndex   = '9999';
+  btn.style.left = `${Math.max(PADDING, Math.min(randomX, maxX))}px`;
+  btn.style.top  = `${Math.max(PADDING, Math.min(randomY, maxY))}px`;
 }, []);
+
 
   const reset = () => {
     setAnswer(null);
@@ -91,12 +118,12 @@ const runAway = useCallback(() => {
   if (!mounted) return null; // Avoid hydration mismatch for the runaway button
 
   return (
-    <main className="min-h-screen bg-[#0f0500] flex flex-col items-center justify-center px-4 overflow-hidden relative">
+    <main className="min-h-screen bg-black-600 flex flex-col items-center justify-center px-4 overflow-hidden relative">
 
       {/* Background blobs */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-amber-900/20 blur-3xl" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-orange-950/30 blur-3xl" />
+        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full blur-3xl" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full blur-3xl" />
       </div>
 
       {/* Floating coffee beans */}
@@ -112,24 +139,24 @@ const runAway = useCallback(() => {
 
       {/* HEADER */}
       <header className="relative z-10 flex items-center gap-4 mb-12 select-none">
-        <span className="text-4xl animate-[wiggle_2s_ease-in-out_infinite]">☕</span>
+        <span className="text-3xl animate-[wiggle_2s_ease-in-out_infinite]">☕</span>
         <h1
-          className="text-5xl md:text-6xl font-black tracking-tight text-transparent bg-clip-text"
+          className="text-4xl md:text-6xl font-black tracking-tight text-transparent bg-clip-text"
           style={{ backgroundImage: 'linear-gradient(135deg, #f5c87a 0%, #d4843a 50%, #a05020 100%)', fontFamily: "'Playfair Display', serif" }}
         >
           Coffee with Alison
         </h1>
-        <span className="text-4xl animate-[wiggle_2s_ease-in-out_infinite_0.5s]">☕</span>
+        <span className="text-3xl animate-[wiggle_2s_ease-in-out_infinite_0.5s]">☕</span>
       </header>
 
       {/* CARD */}
       <div className="relative z-10 w-full max-w-md">
-        <div className="rounded-3xl border border-amber-800/30 bg-white/5 backdrop-blur-xl shadow-[0_32px_80px_rgba(0,0,0,0.6)] p-8 md:p-10">
+        <div className="rounded-3xl border border-black bg-white/5 backdrop-blur-xl shadow-[0_32px_80px_rgba(0,0,0,0.6)] p-8 md:p-10">
 
           {!answer ? (
             <>
               <p
-                className="text-center text-2xl text-amber-100/90 mb-8 italic"
+                className="text-center text-2xl text-black-100/90 mb-8 italic"
                 style={{ fontFamily: "'Playfair Display', serif" }}
               >
                 Coffee this week?
@@ -154,8 +181,8 @@ const runAway = useCallback(() => {
                   ref={noRef}
                   onMouseEnter={runAway}
                   onClick={() => handleClick('no')}
-                  cursor-not-allowed
-                  select-none
+                  // cursor-not-allowed
+                  // select-none
                   className="col-span-1 py-3 px-4 rounded-xl font-bold text-zinc-400 text-sm
                     bg-zinc-800/80 border border-zinc-600/40
                     hover:bg-zinc-700/80 hover:text-zinc-300
@@ -197,29 +224,40 @@ const runAway = useCallback(() => {
                 </p>
               )} */}
             </>
-          ) : (
-            /* RESPONSE STATE */
-            <div className="flex flex-col items-center gap-5 text-center animate-[fadeIn_0.4s_ease]">
-              <span className="text-7xl drop-shadow-lg">{responses[answer].emoji}</span>
-              <p
-                className="text-xl text-amber-100 italic leading-relaxed"
-                style={{ fontFamily: "'Playfair Display', serif" }}
-              >
-                {responses[answer].message}
-              </p>
-              <p className="text-xs text-amber-700/60">Answer saved to Firebase ✓</p>
-              <button
-                onClick={reset}
-                className="mt-2 py-2.5 px-6 rounded-xl font-bold text-sm text-white
-                  bg-gradient-to-br from-amber-500 to-amber-700
-                  hover:from-amber-400 hover:to-amber-600
-                  hover:-translate-y-1 hover:shadow-lg
-                  transition-all duration-150"
-              >
-                Go Back
-              </button>
-            </div>
-          )}
+          ) :  (
+              <div className="flex flex-col items-center gap-5 text-center animate-[fadeIn_0.4s_ease]">
+                <span className="text-7xl drop-shadow-lg">{responses[answer].emoji}</span>
+            
+                <p
+                  className="text-xl text-amber-100 italic leading-relaxed"
+                  style={{ fontFamily: "'Playfair Display', serif" }}
+                >
+                  {responses[answer].message}
+                </p>
+            
+                {/* ✅ Image card */}
+                <div className="w-full rounded-2xl overflow-hidden border border-amber-800/30 shadow-xl">
+                  <img
+                    src={responses[answer].image}
+                    alt="coffee response"
+                    className="w-full h-52 object-cover"
+                  />
+                </div>
+            
+                <p className="text-xs text-amber-700/60">Answer saved to Firebase ✓</p>
+            
+                <button
+                  onClick={reset}
+                  className="w-full py-2.5 px-6 rounded-xl font-bold text-sm text-white
+                    bg-gradient-to-br from-amber-500 to-amber-700
+                    hover:from-amber-400 hover:to-amber-600
+                    hover:-translate-y-1 hover:shadow-lg
+                    transition-all duration-150"
+                >
+                  Ask again? ☕
+                </button>
+              </div>
+            )}
         </div>
       </div>
 
