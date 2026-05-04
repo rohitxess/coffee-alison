@@ -12,26 +12,28 @@ interface ButtonProps {
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  yes: `py-3 px-4 rounded-xl font-bold text-white text-sm
-    bg-gradient-to-br from-amber-500 to-amber-700
-    hover:from-amber-400 hover:to-amber-600
-    hover:-translate-y-1 hover:shadow-lg hover:shadow-amber-900/40
+    yes: `py-3 px-4 rounded-xl font-bold text-black text-sm
+    bg-gradient-to-br from-cyan-400 to-cyan-600
+    border border-black
+    hover:from-cyan-300 hover:to-cyan-500
+    hover:-translate-y-1 hover:shadow-lg
     active:translate-y-0 transition-all duration-150`,
 
-  ofcourse: `py-3 px-4 rounded-xl font-bold text-amber-900 text-sm
-    bg-gradient-to-br from-yellow-300 to-amber-400
-    hover:from-yellow-200 hover:to-amber-300
+  ofcourse: `py-3 px-4 rounded-xl font-bold text-black text-sm
+    bg-cyan-500 from-yellow-300 to-amber-400 
+    border border-black
+    hover:from-cyan-200 hover:to-amber-300
     hover:-translate-y-1 hover:shadow-lg hover:shadow-yellow-900/30
     active:translate-y-0 transition-all duration-150`,
 
-  annoying: `py-3 px-4 rounded-xl font-bold text-zinc-500 text-xs
-    border border-zinc-700/50 bg-transparent
+  annoying: `py-3 px-4 rounded-xl font-bold text-black-500 text-xs
+    border border-black bg-transparent
     hover:border-orange-800/60 hover:text-orange-400/70 hover:bg-orange-950/20
     active:translate-y-0 transition-all duration-150`,
 
-  no: `py-3 px-4 rounded-xl font-bold text-zinc-400 text-sm
-    bg-zinc-800/80 border border-zinc-600/40
-    hover:bg-zinc-700/80 hover:text-zinc-300
+  no: `py-3 px-4 rounded-xl font-bold text-black-400 text-sm
+    bg-black border border border-black
+    hover:bg-black-700/80 hover:text-black-300
     transition-colors duration-75 cursor-not-allowed select-none`,
 };
 
@@ -73,7 +75,7 @@ export function NoButton() {
       className={variantStyles.no}
       style={{ transition: 'left 0.06s, top 0.06s, background 0.15s' }}
     >
-      ❌ No
+      😝 No
     </button>
   );
 }

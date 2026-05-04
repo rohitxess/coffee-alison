@@ -19,10 +19,18 @@ interface CardProps {
 }
 
 export function Card({ question, response, answer, onReset, children }: CardProps) {
+
+    const imagePosition: Record<string, string> = {
+        yes:      'center',
+        ofcourse: 'top',      // ← change this to get the right crop
+        annoying: 'center',
+        no:       'center',
+      };
+
   return (
-    <div className="rounded-3xl border border-amber-800/30 bg-white/5 backdrop-blur-xl
-      shadow-[0_32px_80px_rgba(0,0,0,0.6)] p-8 md:p-10 w-full max-w-md"
-    >
+<div className="rounded-3xl border border-gray-500 bg-cyan-500 backdrop-blur-xl
+  shadow-[0_32px_80px_rgba(0,0,0,0.6)] p-8 md:p-10 w-full max-w-md">
+    
       {/* Question state — renders buttons passed as children */}
       {!answer && (
         <>
@@ -44,7 +52,7 @@ export function Card({ question, response, answer, onReset, children }: CardProp
           <span className="text-7xl drop-shadow-lg">{response.emoji}</span>
 
           <p
-            className="text-xl text-amber-100 italic leading-relaxed"
+            className="text-xl text-stone-900 italic leading-relaxed"
             style={{ fontFamily: "'Playfair Display', serif" }}
           >
             {response.message}
@@ -55,7 +63,9 @@ export function Card({ question, response, answer, onReset, children }: CardProp
             <img
               src={response.image}
               alt="response"
-              className="w-full h-52 object-cover"
+              className="w-full h-52 object-contain"
+              style={{ objectPosition: imagePosition[answer!] }}
+
             />
           </div>
 

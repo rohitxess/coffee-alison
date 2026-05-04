@@ -15,12 +15,12 @@ const responses: Record<NonNullable<AnswerType>, { emoji: string; message: strin
     image: '/images/yes.png',
   },
   ofcourse: {
-    emoji: '✨', 
+    emoji: '', 
     message: "OBVIOUSLY!",
     image: '/images/hahadoggy.png',
   },
   annoying: { 
-    emoji: '😤',
+    emoji: '',
     message: "I'll take it as a compliment",
     image: '/images/oops.png',
   },
@@ -111,15 +111,15 @@ export default function Home() {
       
       <div className="relative z-10 w-full max-w-md">
         <Card
-          question="Do you want coffee?"
+          question="Coffee this week?"
           answer={answer}
           response={answer ? responses[answer] : undefined}
           onReset={reset}
         >
-          <Button variant="yes" onClick={() => handleClick('yes')}>✅ Yes</Button>
+          <Button variant="yes" onClick={() => handleClick('yes')}>Yes</Button>
           <NoButton />
-          <Button variant="ofcourse" onClick={() => handleClick('ofcourse')}>🌟 Of course yes</Button>
-          <Button variant="annoying" onClick={() => handleClick('annoying')}>😤 You are annoying</Button>
+          <Button variant="ofcourse" onClick={() => handleClick('ofcourse')}>Of course Yes</Button>
+          <Button variant="annoying" onClick={() => handleClick('annoying')}>Yes, but you are annoying</Button>
         </Card>
       </div>
 
