@@ -67,50 +67,6 @@ export default function Home() {
   saveToFirebase(ans).catch((e) => console.error('Firebase error:', e));
     };
 
-// Runaway logic for the "No" button - flies off the screen
-
-  // const runAway = useCallback(() => {
-  //   const btn = noRef.current;
-  //   if (!btn) return;
-  //   const vw = window.innerWidth  - 160;
-  //   const vh = window.innerHeight - 60;
-  //   btn.style.position = 'fixed';
-  //   btn.style.left     = `${Math.random() * vw}px`;
-  //   btn.style.top      = `${Math.random() * vh}px`;
-  //   btn.style.zIndex   = '9999';
-  // }, []);
-
-// button to stay visible on the screen append to the child 
-
-const runAway = useCallback(() => {
-  const btn = noRef.current;
-  if (!btn) return;
-
-  // Move to body so position:fixed is always relative to the viewport
-  if (btn.parentElement !== document.body) {
-    document.body.appendChild(btn);
-  }
-
-  btn.style.position = 'fixed';
-  btn.style.zIndex   = '9999';
-  btn.style.margin   = '0'; // kill any inherited margin
-
-  const PADDING  = 20;
-  const btnWidth  = btn.offsetWidth;
-  const btnHeight = btn.offsetHeight;
-
-  const maxX = window.innerWidth  - btnWidth  - PADDING;
-  const maxY = window.innerHeight - btnHeight - PADDING;
-
-  // Clamp both axes so it can never go off-screen
-  const randomX = Math.floor(Math.random() * maxX);
-  const randomY = Math.floor(Math.random() * maxY);
-
-  btn.style.left = `${Math.max(PADDING, Math.min(randomX, maxX))}px`;
-  btn.style.top  = `${Math.max(PADDING, Math.min(randomY, maxY))}px`;
-}, []);
-
-
   const reset = () => {
     setAnswer(null);
     const btn = noRef.current;

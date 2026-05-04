@@ -59,7 +59,7 @@ export function Card({ question, response, answer, onReset, children }: CardProp
             />
           </div>
 
-          <p className="text-xs text-amber-700/60">Answer saved to Firebase ✓</p>
+          {/* <p className="text-xs text-amber-700/60">Answer saved to Firebase ✓</p> */}
 
           <Button variant="yes" onClick={onReset}>
             Go Back
