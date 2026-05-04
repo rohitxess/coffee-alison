@@ -64,8 +64,19 @@ export default function Home() {
   if (!ans) return;
   setAnswer(ans);  // show response immediately
   console.log(ans);
+
   saveToFirebase(ans).catch((e) => console.error('Firebase error:', e));
+
+   // Send SMS to your phone
+   fetch('/api/notify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ answer: ans }),
+  }).catch(console.error);
+  
     };
+
+  
 
   const reset = () => {
     setAnswer(null);
