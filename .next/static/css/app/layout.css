@@ -550,6 +550,9 @@ video {
 .grid {
   display: grid;
 }
+.hidden {
+  display: none;
+}
 .h-52 {
   height: 13rem;
 }

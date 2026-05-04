@@ -7,6 +7,21 @@ import { Card } from '@/ui/card';
 import { Button, NoButton } from '@/ui/button';
 
 type AnswerType = 'yes' | 'ofcourse' | 'annoying' | 'no' | null;
+const gifs = [
+  '/images/gify1.gif',
+  '/images/gify2.gif',
+  '/images/gify3.gif',
+  '/images/gify4.gif',
+  '/images/gify5.gif',
+  '/images/gify6.gif',
+  '/images/gify7.gif',
+  '/images/gify8.gif',
+  '/images/gify9.gif',
+  '/images/gify10.gif',
+  '/images/gify11.gif',
+  '/images/gify12.gif',
+  '/images/gify13.gif',
+];
 
 const responses: Record<NonNullable<AnswerType>, { emoji: string; message: string, image: string }> = {
   yes:      { 
@@ -73,7 +88,7 @@ export default function Home() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ answer: ans }),
   }).catch(console.error);
-  
+
     };
 
   
@@ -100,6 +115,42 @@ export default function Home() {
           ☕
         </span>
       ))}
+
+      {/* Marquee row */}
+
+      <div
+  style={{
+    width: '100%',
+    overflow: 'hidden',
+    marginBottom: '2rem',
+  }}
+>
+  <div
+    style={{
+      display: 'flex',
+      gap: '16px',
+      animation: 'marquee 60s linear infinite',
+      width: 'max-content',
+      height: '150px',
+    }}
+  >
+    {/* Render twice so it loops seamlessly */}
+    {[...gifs, ...gifs].map((gif, i) => (
+      <img
+        key={i}
+        src={gif}
+        alt={`gif-${i}`}
+        style={{
+          height: '100px',
+          width: '100px',
+          objectFit: 'cover',
+          borderRadius: '12px',
+          border: '2px solid #d1d5db',
+        }}
+      />
+    ))}
+  </div>
+</div>
 
       {/* HEADER */}
       <header className="relative z-10 flex items-center gap-4 mb-12 select-none">
@@ -150,10 +201,22 @@ export default function Home() {
           0%,100% { transform: rotate(-8deg) translateY(0); }
           50%      { transform: rotate(8deg)  translateY(-6px); }
         }
+
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(12px); }
           to   { opacity: 1; transform: translateY(0); }
         }
+
+        @keyframes wiggle {
+          0%,100% { transform: rotate(-8deg) translateY(0); }
+          50%      { transform: rotate(8deg) translateY(-6px); }
+        }
+
+        @keyframes marquee {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+
       `}</style>
     </main>
   );
