@@ -3,6 +3,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { Card } from '@/ui/card';
+import { Button, NoButton } from '@/ui/button';
 
 type AnswerType = 'yes' | 'ofcourse' | 'annoying' | 'no' | null;
 
@@ -150,115 +152,19 @@ const runAway = useCallback(() => {
       </header>
 
       {/* CARD */}
+      
       <div className="relative z-10 w-full max-w-md">
-        <div className="rounded-3xl border border-black bg-white/5 backdrop-blur-xl shadow-[0_32px_80px_rgba(0,0,0,0.6)] p-8 md:p-10">
-
-          {!answer ? (
-            <>
-              <p
-                className="text-center text-2xl text-black-100/90 mb-8 italic"
-                style={{ fontFamily: "'Playfair Display', serif" }}
-              >
-                Coffee this week?
-              </p>
-
-              <div className="grid grid-cols-2 gap-3">
-                {/* YES */}
-                <button
-                  onClick={() => handleClick('yes')}
-                  // disabled={loading}
-                  className="col-span-1 py-3 px-4 rounded-xl font-bold text-white text-sm
-                    bg-gradient-to-br from-amber-500 to-amber-700
-                    hover:from-amber-400 hover:to-amber-600
-                    hover:-translate-y-1 hover:shadow-lg hover:shadow-amber-900/40
-                    active:translate-y-0 transition-all duration-150 disabled:opacity-50"
-                >
-                  Yes!
-                </button>
-
-                {/* NO — the runaway button */}
-                <button
-                  ref={noRef}
-                  onMouseEnter={runAway}
-                  onClick={() => handleClick('no')}
-                  // cursor-not-allowed
-                  // select-none
-                  className="col-span-1 py-3 px-4 rounded-xl font-bold text-zinc-400 text-sm
-                    bg-zinc-800/80 border border-zinc-600/40
-                    hover:bg-zinc-700/80 hover:text-zinc-300
-                    active:translate-y-0 transition-colors duration-75 cursor-not-allowed"
-                  style={{ transition: 'left 0.06s, top 0.06s, background 0.15s' }}
-                >
-                  ❌ No
-                </button>
-
-                {/* OF COURSE */}
-                <button
-                  onClick={() => handleClick('ofcourse')}
-                  // disabled={loading}
-                  className="col-span-1 py-3 px-4 rounded-xl font-bold text-amber-900 text-sm
-                    bg-gradient-to-br from-yellow-300 to-amber-400
-                    hover:from-yellow-200 hover:to-amber-300
-                    hover:-translate-y-1 hover:shadow-lg hover:shadow-yellow-900/30
-                    active:translate-y-0 transition-all duration-150 disabled:opacity-50"
-                >
-                  🌟 Of course yes
-                </button>
-
-                {/* ANNOYING */}
-                <button
-                  onClick={() => handleClick('annoying')}
-                  // disabled={loading}
-                  className="col-span-1 py-3 px-4 rounded-xl font-bold text-zinc-500 text-xs
-                    border border-zinc-700/50 bg-transparent
-                    hover:border-orange-800/60 hover:text-orange-400/70 hover:bg-orange-950/20
-                    active:translate-y-0 transition-all duration-150 disabled:opacity-50"
-                >
-                  Yes!! But you are annoying
-                </button>
-              </div>
-
-              {/* {loading && (
-                <p className="text-center text-amber-600/60 text-xs mt-4 animate-pulse">
-                  Saving your answer…
-                </p>
-              )} */}
-            </>
-          ) :  (
-              <div className="flex flex-col items-center gap-5 text-center animate-[fadeIn_0.4s_ease]">
-                <span className="text-7xl drop-shadow-lg">{responses[answer].emoji}</span>
-            
-                <p
-                  className="text-xl text-amber-100 italic leading-relaxed"
-                  style={{ fontFamily: "'Playfair Display', serif" }}
-                >
-                  {responses[answer].message}
-                </p>
-            
-                {/* ✅ Image card */}
-                <div className="w-full rounded-2xl overflow-hidden border border-amber-800/30 shadow-xl">
-                  <img
-                    src={responses[answer].image}
-                    alt="coffee response"
-                    className="w-full h-52 object-cover"
-                  />
-                </div>
-            
-                <p className="text-xs text-amber-700/60">Answer saved to Firebase ✓</p>
-            
-                <button
-                  onClick={reset}
-                  className="w-full py-2.5 px-6 rounded-xl font-bold text-sm text-white
-                    bg-gradient-to-br from-amber-500 to-amber-700
-                    hover:from-amber-400 hover:to-amber-600
-                    hover:-translate-y-1 hover:shadow-lg
-                    transition-all duration-150"
-                >
-                  Ask again? ☕
-                </button>
-              </div>
-            )}
-        </div>
+        <Card
+          question="Do you want coffee?"
+          answer={answer}
+          response={answer ? responses[answer] : undefined}
+          onReset={reset}
+        >
+          <Button variant="yes" onClick={() => handleClick('yes')}>✅ Yes</Button>
+          <NoButton />
+          <Button variant="ofcourse" onClick={() => handleClick('ofcourse')}>🌟 Of course yes</Button>
+          <Button variant="annoying" onClick={() => handleClick('annoying')}>😤 You are annoying</Button>
+        </Card>
       </div>
 
       {/* Google font + custom keyframes */}

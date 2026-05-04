@@ -568,9 +568,6 @@ video {
 .mb-8 {
   margin-bottom: 2rem;
 }
-.mt-2 {
-  margin-top: 0.5rem;
-}
 .mt-4 {
   margin-top: 1rem;
 }
@@ -580,14 +577,14 @@ video {
 .grid {
   display: grid;
 }
+.h-52 {
+  height: 13rem;
+}
 .h-\[40vw\] {
   height: 40vw;
 }
 .h-\[50vw\] {
   height: 50vw;
-}
-.h-52 {
-  height: 13rem;
 }
 .min-h-screen {
   min-height: 100vh;
@@ -672,6 +669,9 @@ video {
 .overflow-hidden {
   overflow: hidden;
 }
+.rounded-2xl {
+  border-radius: 1rem;
+}
 .rounded-3xl {
   border-radius: 1.5rem;
 }
@@ -681,37 +681,21 @@ video {
 .rounded-xl {
   border-radius: 0.75rem;
 }
-.rounded-2xl {
-  border-radius: 1rem;
-}
 .border {
   border-width: 1px;
 }
 .border-amber-800\/30 {
   border-color: rgb(146 64 14 / 0.3);
 }
+.border-black {
+  --tw-border-opacity: 1;
+  border-color: rgb(0 0 0 / var(--tw-border-opacity, 1));
+}
 .border-zinc-600\/40 {
   border-color: rgb(82 82 91 / 0.4);
 }
 .border-zinc-700\/50 {
   border-color: rgb(63 63 70 / 0.5);
-}
-.border-gray-800\/30 {
-  border-color: rgb(31 41 55 / 0.3);
-}
-.border-black {
-  --tw-border-opacity: 1;
-  border-color: rgb(0 0 0 / var(--tw-border-opacity, 1));
-}
-.bg-\[\#d0e1e1\] {
-  --tw-bg-opacity: 1;
-  background-color: rgb(208 225 225 / var(--tw-bg-opacity, 1));
-}
-.bg-amber-900\/20 {
-  background-color: rgb(120 53 15 / 0.2);
-}
-.bg-orange-950\/30 {
-  background-color: rgb(67 20 7 / 0.3);
 }
 .bg-transparent {
   background-color: transparent;
@@ -721,17 +705,6 @@ video {
 }
 .bg-zinc-800\/80 {
   background-color: rgb(39 39 42 / 0.8);
-}
-.bg-gray-900 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(17 24 39 / var(--tw-bg-opacity, 1));
-}
-.bg-gray-900\/20 {
-  background-color: rgb(17 24 39 / 0.2);
-}
-.bg-black {
-  --tw-bg-opacity: 1;
-  background-color: rgb(0 0 0 / var(--tw-bg-opacity, 1));
 }
 .bg-gradient-to-br {
   background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
@@ -786,13 +759,13 @@ video {
   font-size: 1.5rem;
   line-height: 2rem;
 }
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
 .text-4xl {
   font-size: 2.25rem;
   line-height: 2.5rem;
-}
-.text-5xl {
-  font-size: 3rem;
-  line-height: 1;
 }
 .text-7xl {
   font-size: 4.5rem;
@@ -809,10 +782,6 @@ video {
 .text-xs {
   font-size: 0.75rem;
   line-height: 1rem;
-}
-.text-3xl {
-  font-size: 1.875rem;
-  line-height: 2.25rem;
 }
 .font-black {
   font-weight: 900;
@@ -832,9 +801,6 @@ video {
 .text-amber-100 {
   --tw-text-opacity: 1;
   color: rgb(254 243 199 / var(--tw-text-opacity, 1));
-}
-.text-amber-100\/90 {
-  color: rgb(254 243 199 / 0.9);
 }
 .text-amber-600\/60 {
   color: rgb(217 119 6 / 0.6);
