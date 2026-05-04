@@ -59,7 +59,7 @@ export default function Home() {
   //   setLoading(false);
   // };
 
-  // ✅ New — shows response instantly, saves in background
+  // New — shows response instantly, saves in background
   const handleClick = (ans: AnswerType) => {
   if (!ans) return;
   setAnswer(ans);  // show response immediately
@@ -76,13 +76,8 @@ export default function Home() {
   if (!mounted) return null; // Avoid hydration mismatch for the runaway button
 
   return (
-    <main className="min-h-screen bg-black-600 flex flex-col items-center justify-center px-4 overflow-hidden relative">
-
-      {/* Background blobs */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full blur-3xl" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full blur-3xl" />
-      </div>
+<main className="min-h-screen flex flex-col items-center justify-center px-4"
+  style={{ backgroundColor: 'white' }}>
 
       {/* Floating coffee beans */}
       {['top-10 left-10', 'top-20 right-16', 'bottom-16 left-20', 'bottom-10 right-10'].map((pos, i) => (
@@ -100,7 +95,7 @@ export default function Home() {
         <span className="text-3xl animate-[wiggle_2s_ease-in-out_infinite]">☕</span>
         <h1
           className="text-4xl md:text-6xl font-black tracking-tight text-transparent bg-clip-text"
-          style={{ backgroundImage: 'linear-gradient(135deg, #f5c87a 0%, #d4843a 50%, #a05020 100%)', fontFamily: "'Playfair Display', serif" }}
+          style={{ backgroundImage: 'linear-gradient(135deg, #c87a20 0%, #a05020 50%, #6b3010 100%)' }}
         >
           Coffee with Alison
         </h1>
@@ -109,7 +104,7 @@ export default function Home() {
 
       {/* CARD */}
       
-      <div className="relative z-10 w-full max-w-md">
+      {/* <div className="relative z-10 w-full max-w-md">
         <Card
           question="Coffee this week?"
           answer={answer}
@@ -121,7 +116,21 @@ export default function Home() {
           <Button variant="ofcourse" onClick={() => handleClick('ofcourse')}>Of course Yes</Button>
           <Button variant="annoying" onClick={() => handleClick('annoying')}>Yes, but you are annoying</Button>
         </Card>
-      </div>
+      </div> */}
+
+<div className="w-full max-w-md px-4 align-centre">
+    <Card
+      question="Coffee this week?"
+      answer={answer}
+      response={answer ? responses[answer] : undefined}
+      onReset={reset}
+    >
+      <Button variant="yes" onClick={() => handleClick('yes')}>Yes</Button>
+      <NoButton />
+      <Button variant="ofcourse" onClick={() => handleClick('ofcourse')}>Of course Yes</Button>
+      <Button variant="annoying" onClick={() => handleClick('annoying')}>Yes, but you are annoying</Button>
+    </Card>
+  </div>
 
       {/* Google font + custom keyframes */}
       <style>{`

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from './button';
+import { Button } from '@/ui/button';
 
 type AnswerType = 'yes' | 'ofcourse' | 'annoying' | 'no';
 
@@ -20,27 +20,38 @@ interface CardProps {
 
 export function Card({ question, response, answer, onReset, children }: CardProps) {
 
-    const imagePosition: Record<string, string> = {
-        yes:      'center',
-        ofcourse: 'top',      // ← change this to get the right crop
-        annoying: 'center',
-        no:       'center',
-      };
+  const imagePosition: Record<string, string> = {
+    yes:      'center',
+    ofcourse: 'top',
+    annoying: 'center',
+    no:       'center',
+  };
 
   return (
-<div className="rounded-3xl border border-gray-500 bg-cyan-500 backdrop-blur-xl
-  shadow-[0_32px_80px_rgba(0,0,0,0.6)] p-8 md:p-10 w-full max-w-md">
-    
-      {/* Question state — renders buttons passed as children */}
+    <div
+    className="relative z-10 w-full rounded-3xl p-8"
+    style={{
+      backgroundColor: 'white',
+      border: '2px solid #d1d5db',   
+      borderRadius: '24px',          
+      boxShadow: '0 4px 24px rgba(0,0,0,0.10)',
+    }}
+  >
+      {/* Question state */}
       {!answer && (
         <>
-          <p
-            className="text-center text-2xl text-amber-100/90 mb-8 italic"
-            style={{ fontFamily: "'Playfair Display', serif" }}
-          >
+          <p className="text-center text-2xl font-bold text-gray-800 mb-6 w-full">
             {question}
           </p>
-          <div className="grid grid-cols-2 gap-3">
+
+          {/* 2x2 grid */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '12px',
+            }}
+          >
             {children}
           </div>
         </>
@@ -48,31 +59,26 @@ export function Card({ question, response, answer, onReset, children }: CardProp
 
       {/* Response state */}
       {answer && response && (
-        <div className="flex flex-col items-center gap-5 text-center animate-[fadeIn_0.4s_ease]">
-          <span className="text-7xl drop-shadow-lg">{response.emoji}</span>
+        <div className="flex flex-col items-center gap-5 text-center">
+          {response.emoji && (
+            <span className="text-7xl drop-shadow-lg">{response.emoji}</span>
+          )}
 
-          <p
-            className="text-xl text-stone-900 italic leading-relaxed"
-            style={{ fontFamily: "'Playfair Display', serif" }}
-          >
+          <p className="text-xl text-gray-800 font-semibold italic leading-relaxed">
             {response.message}
           </p>
 
-          {/* Image */}
-          <div className="w-full rounded-2xl overflow-hidden border border-amber-800/30 shadow-xl">
+          <div className="w-full rounded-2xl overflow-hidden border border-gray-200 shadow-xl bg-gray-50">
             <img
               src={response.image}
               alt="response"
               className="w-full h-52 object-contain"
-              style={{ objectPosition: imagePosition[answer!] }}
-
+              style={{ objectPosition: imagePosition[answer] }}
             />
           </div>
 
-          {/* <p className="text-xs text-amber-700/60">Answer saved to Firebase ✓</p> */}
-
           <Button variant="yes" onClick={onReset}>
-            Go Back
+            Go Back ☕
           </Button>
         </div>
       )}
