@@ -31,9 +31,7 @@ export function Footer() {
           >
             ❤️
           </span>
-          and
-          <span>☕</span>
-          by <strong style={{ color: 'white' }}>Alison</strong>
+          for <strong style={{ color: 'white' }}>Alison</strong>
         </p>
   
         <style>{`

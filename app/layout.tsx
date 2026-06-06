@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import LoginPage from './page';
 // import {Geist, Geist_Mono}  from '@next/font/google';
 
 // const geistSans = Geist({ variables: '--font-geist-sans', subsets: ['latin'] });
