@@ -3,7 +3,6 @@ export function Footer() {
       <footer
         style={{
           width: '100%',
-          backgroundColor: '#09090b',
           borderTop: '1px solid #27272a',
           padding: '20px 32px',
           display: 'flex',
@@ -31,7 +30,7 @@ export function Footer() {
           >
             ❤️
           </span>
-          for <strong style={{ color: 'white' }}>Alison</strong>
+          for <strong style={{ color: 'black' }}>Alison</strong>
         </p>
   
         <style>{`

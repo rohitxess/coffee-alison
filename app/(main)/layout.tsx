@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import { SidebarProvider, useSidebar } from '@/lib/sidebar-context';
@@ -12,15 +10,25 @@ function MainContent({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
         marginLeft: open ? '240px' : '64px',
         transition: 'margin-left 0.25s ease',
-        minHeight: '100vh',
+        width: open ? 'calc(100% - 240px)' : 'calc(100% - 64px)',
+        height: '100vh',              // ← exact viewport height
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',           // ← no scroll on layout
+        boxSizing: 'border-box',
       }}
     >
-      <main style={{ flex: 1, padding: '32px' }}>
+      {/* Page content fills available space */}
+      <main
+        style={{
+          flex: 1,
+          padding: '32px',
+          overflow: 'hidden',         // ← no scroll inside main
+          boxSizing: 'border-box',
+        }}
+      >
         {children}
       </main>
       <Footer />
@@ -31,7 +39,14 @@ function MainContent({ children }: { children: React.ReactNode }) {
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f9fafb' }}>
+      <div
+        style={{
+          display: 'flex',
+          height: '100vh',            // ← full viewport, no overflow
+          overflow: 'hidden',
+          backgroundColor: '#f9fafb',
+        }}
+      >
         <Sidebar />
         <MainContent>{children}</MainContent>
       </div>

@@ -146,7 +146,7 @@ export function Sidebar() {
             whiteSpace: 'nowrap',
           }}
         >
-          ☕ Coffee with Alison
+          Alison Lu
         </div>
       )}
 
