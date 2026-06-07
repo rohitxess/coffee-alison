@@ -22,17 +22,66 @@ export default function LoginPage() {
         padding: 0,
       }}
     >
-      {/* LEFT — Cover Image */}
-      <div
-        className="cover-image"
-        style={{
-          flex: 1,
-          backgroundImage: 'url(/images/login-cover.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          display: 'none',
-        }}
-      />
+      {/* LEFT — Sky Blue Background with Neon Text */}
+<div
+  className="cover-image"
+  style={{
+    flex: 1,
+    backgroundColor: '#e0f2fe',  // ← light sky blue, no image
+    display: 'none',
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  }}
+>
+  {/* Neon Text */}
+  <div
+    style={{
+      position: 'absolute',
+      inset: 0,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'column',
+      gap: '16px',
+      zIndex: 1,
+    }}
+  >
+    <span
+      style={{
+        fontSize: 'clamp(2.5rem, 6vw, 5rem)',
+        fontWeight: '900',
+        color: '#fff',
+        letterSpacing: '0.1em',
+        animation: 'glow 1.5s infinite alternate',
+        display: 'inline-block',
+        textAlign: 'center',
+        textShadow: `
+          0 0 5px #fff,
+          0 0 10px #fff,
+          0 0 20px #0891b2,
+          0 0 40px #0891b2,
+          0 0 80px #0891b2,
+          0 0 120px #0891b2
+          `,
+      }}
+    >
+     Asian Fine Xi
+    </span>
+
+    <p
+      style={{
+        color: '#0369a1',
+        fontSize: '14px',
+        letterSpacing: '0.2em',
+        textTransform: 'uppercase',
+        margin: 0,
+        fontWeight: '600',
+      }}
+    >
+    </p>
+  </div>
+</div>
 
       {/*Login Form */}
       <div
@@ -245,6 +294,26 @@ export default function LoginPage() {
         input::placeholder {
           color: #52525b;
         }
+        
+        @keyframes neonFlicker {
+          0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+            text-shadow:
+              0 0 5px #fff,
+              0 0 10px #fff,
+              0 0 20px #ff00ff,
+              0 0 40px #ff00ff,
+              0 0 80px #ff00ff,
+              0 0 120px #ff00ff;
+            opacity: 1;
+          }
+          20%, 24%, 55% {
+            text-shadow: none;
+            opacity: 0.4;
+          }
+        }
+
+        input::placeholder { color: #52525b; }
+
       `}</style>
     </div>
   );

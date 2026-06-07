@@ -11,6 +11,7 @@ import {
   orderBy,
   deleteDoc,
   doc,
+  updateDoc,
 } from 'firebase/firestore';
 
 type Note = {
@@ -29,7 +30,10 @@ export default function NotesPage() {
   const [search, setSearch]     = useState('');
   const [mounted, setMounted]   = useState(false);
   const [saving, setSaving]     = useState(false);
-  const [page, setPage]         = useState(1); // ← current page
+  const [page, setPage]         = useState(1); 
+  const [editing, setEditing]   = useState<Note | null>(null);
+  const [editQuestion, setEditQuestion] = useState('');
+  const [editResponse, setEditResponse] = useState('');  
 
   useEffect(() => {
     setMounted(true);
@@ -78,6 +82,28 @@ export default function NotesPage() {
       await deleteDoc(doc(db, 'notes', id));
     } catch (e) {
       console.error('Error deleting note:', e);
+    }
+  };
+
+  const handleEdit = async (note: Note) => {
+    setEditing(note);
+    setEditQuestion(note.question);
+    setEditResponse(note.response);
+  }
+
+  const handleUpdate = async () => {
+    if (!editing || !editQuestion.trim() || !editResponse.trim()) return;
+    try {
+      await updateDoc(doc(db, 'notes', editing.id), {
+        question: editQuestion.trim(),
+        response: editResponse.trim(),
+      });
+      console.log('✅ Note updated!');
+      setEditing(null);
+      setEditQuestion('');
+      setEditResponse('');
+    } catch (e: any) {
+      console.error('❌ Update error:', e.message);
     }
   };
 
@@ -290,7 +316,32 @@ export default function NotesPage() {
                   </p>
                 </div>
 
-                {/* Delete */}
+                {/* Edit + Delete buttons */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+
+                {/* Edit Button */}
+                <button
+                  onClick={() => handleEdit(note)}
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: '#a05020',
+                    padding: '4px',
+                    borderRadius: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#fef3c7'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </button>
+
+                {/* Delete Button */}
                 <button
                   onClick={() => handleDelete(note.id)}
                   style={{
@@ -313,6 +364,9 @@ export default function NotesPage() {
                     <path d="M9 6V4h6v2"/>
                   </svg>
                 </button>
+
+                </div>
+
               </div>
             ))}
           </div>
@@ -407,6 +461,173 @@ export default function NotesPage() {
       <style>{`
         input::placeholder, textarea::placeholder { color: #a1a1aa; }
       `}</style>
+
+      {/* Edit Modal */}
+{editing && (
+  <div
+    onClick={() => setEditing(null)}
+    style={{
+      position: 'fixed',
+      inset: 0,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 9999,
+      padding: '24px',
+    }}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        backgroundColor: 'white',
+        borderRadius: '16px',
+        padding: '28px',
+        width: '100%',
+        maxWidth: '520px',
+        boxShadow: '0 24px 60px rgba(0,0,0,0.2)',
+      }}
+    >
+      {/* Modal Header */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '20px',
+        }}
+      >
+        <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#09090b', margin: 0 }}>
+          ✏️ Edit Note
+        </h2>
+        <button
+          onClick={() => setEditing(null)}
+          style={{
+            backgroundColor: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#71717a',
+            padding: '4px',
+            borderRadius: '6px',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f4f4f5'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      {/* Edit Fields */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+        {/* Question */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <label style={{ fontSize: '13px', fontWeight: '600', color: '#09090b' }}>
+            Question
+          </label>
+          <textarea
+            value={editQuestion}
+            onChange={(e) => setEditQuestion(e.target.value)}
+            rows={3}
+            style={{
+              padding: '10px 12px',
+              borderRadius: '10px',
+              border: '1.5px solid #e4e4e7',
+              fontSize: '14px',
+              color: '#09090b',
+              outline: 'none',
+              resize: 'none',
+              fontFamily: 'inherit',
+              backgroundColor: '#fafafa',
+              boxSizing: 'border-box',
+              width: '100%',
+            }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = '#a05020'; }}
+            onBlur={(e)  => { e.currentTarget.style.borderColor = '#e4e4e7'; }}
+          />
+        </div>
+
+        {/* Response */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <label style={{ fontSize: '13px', fontWeight: '600', color: '#09090b' }}>
+            Response
+          </label>
+          <textarea
+            value={editResponse}
+            onChange={(e) => setEditResponse(e.target.value)}
+            rows={3}
+            style={{
+              padding: '10px 12px',
+              borderRadius: '10px',
+              border: '1.5px solid #e4e4e7',
+              fontSize: '14px',
+              color: '#09090b',
+              outline: 'none',
+              resize: 'none',
+              fontFamily: 'inherit',
+              backgroundColor: '#fafafa',
+              boxSizing: 'border-box',
+              width: '100%',
+            }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = '#a05020'; }}
+            onBlur={(e)  => { e.currentTarget.style.borderColor = '#e4e4e7'; }}
+          />
+        </div>
+
+        {/* Buttons */}
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+          <button
+            onClick={() => setEditing(null)}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: 'white',
+              color: '#09090b',
+              border: '1.5px solid #e4e4e7',
+              borderRadius: '10px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f4f4f5'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'white'; }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleUpdate}
+            disabled={!editQuestion.trim() || !editResponse.trim()}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#09090b',
+              color: 'white',
+              border: 'none',
+              borderRadius: '10px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              opacity: !editQuestion.trim() || !editResponse.trim() ? 0.5 : 1,
+              transition: 'all 0.15s',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#27272a'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#09090b'; }}
+          >
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+
     </div>
   );
 }
