@@ -21,6 +21,11 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(main)/layout.js"
     ],
+    "/(main)/notes/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(main)/notes/page.js"
+    ],
     "/(main)/coffee/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",

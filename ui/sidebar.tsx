@@ -70,10 +70,10 @@ const LogoutIcon = () => (
 const navLinks: NavLink[] = [
   { label: 'Home',     href: '/home',   icon: <HomeIcon />    },
   { label: 'Coffee',   href: '/coffee', icon: <CoffeeIcon />  },
-  { label: 'Notes',    href: '#',       icon: <NotesIcon />   },
-  { label: 'Gallery',  href: '#',       icon: <GalleryIcon /> },
-  { label: 'Profile',  href: '#',       icon: <ProfileIcon /> },
-  { label: 'Settings', href: '#',       icon: <SettingsIcon />},
+  { label: 'Notes',    href: '/notes',  icon: <NotesIcon />   },
+  { label: 'Gallery',  href: '/gallery', icon: <GalleryIcon /> },
+  { label: 'Profile',  href: '/profile', icon: <ProfileIcon /> },
+  { label: 'Settings', href: '/settings', icon: <SettingsIcon />},
 ];
 
 export function Sidebar() {
