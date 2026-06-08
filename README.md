@@ -1,6 +1,5 @@
-# ☕ Coffee Alison
 
-A playful Next.js app with Tailwind CSS + Firebase Firestore. The "No" button runs away from your mouse!
+A playful Next.js app with Tailwind CSS + Firebase Firestore. 
 
 ## Tech Stack
 - **Next.js 14** (App Router)
@@ -8,7 +7,9 @@ A playful Next.js app with Tailwind CSS + Firebase Firestore. The "No" button ru
 - **Typescript** 
 - **React.js**
 - **Firebase Firestore** for storing responses
+- **Firebase Storage** for storing jpeg and png files 
 - **Twilio** for sms routing
+- **Zod and express** for validation and authentication 
 
 ## Setup
 
@@ -32,11 +33,3 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) 
 
-## Firestore Data Structure
-Each click saves a document to the `responses` collection:
-```json
-{
-  "answer": "answer1" | "answer2" | "answer3" | "answer4",
-  "createdAt": <Firestore Timestamp>
-}
-```

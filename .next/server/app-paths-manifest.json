@@ -1,7 +1,8 @@
 {
-  "/(main)/home/page": "app/(main)/home/page.js",
-  "/(main)/gallery/page": "app/(main)/gallery/page.js",
-  "/(main)/coffee/page": "app/(main)/coffee/page.js",
+  "/api/auth/login/route": "app/api/auth/login/route.js",
   "/(main)/notes/page": "app/(main)/notes/page.js",
-  "/(main)/profile/page": "app/(main)/profile/page.js"
+  "/(main)/home/page": "app/(main)/home/page.js",
+  "/(main)/coffee/page": "app/(main)/coffee/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/page": "app/page.js"
 }

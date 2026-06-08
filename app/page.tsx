@@ -1,17 +1,61 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { loginSchema } from '@/lib/validation';
 
 export default function LoginPage() {
+
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
+  const [errors, setErrors]     = useState<{ email?: string[]; password?: string[]; general?: string[] }>({});
+  const [loading, setLoading]   = useState(false);
+  const [mounted, setMounted]   = useState(false);
   const router                  = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
+  if (!mounted) return null;
+
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors({});
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     router.push('/home');
   };
+
+   // ← Client-side Zod validation first
+   const result = loginSchema.safeParse({ email, password });
+   if (!result.success) {
+     setErrors(result.error.flatten().fieldErrors);
+     return;
+   }
+
+   setLoading(true);
+
+   try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      router.push('/home');
+    } else {
+      setErrors(data.errors || {});
+    }
+  } catch (e) {
+    setErrors({ general: ['Something went wrong. Please try again.'] });
+  }
+
+  setLoading(false);
+};
 
   return (
     <div
@@ -113,18 +157,32 @@ export default function LoginPage() {
             </p>
           </div>
 
+
+              {/* General Error */}
+          {errors.general && (
+            <div
+              style={{
+                backgroundColor: '#fef2f2',
+                border: '1px solid #fecaca',
+                borderRadius: '8px',
+                padding: '10px 14px',
+                marginBottom: '16px',
+                color: '#ef4444',
+                fontSize: '13px',
+              }}
+            >
+              {errors.general[0]}
+            </div>
+          )}
+
+
           {/* Form */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-            {/* Email */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label
-                style={{
-                  color: 'white',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                }}
-              >
+           
+             {/* Email */}
+             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ color: 'white', fontSize: '14px', fontWeight: '500' }}>
                 Email
               </label>
               <input
@@ -134,7 +192,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 style={{
                   backgroundColor: '#0a0a0a',
-                  border: '1px solid #27272a',
+                  border: `1px solid ${errors.email ? '#ef4444' : '#27272a'}`,
                   borderRadius: '8px',
                   padding: '12px 14px',
                   color: 'white',
@@ -144,36 +202,26 @@ export default function LoginPage() {
                   boxSizing: 'border-box',
                 }}
                 onFocus={(e) => { e.currentTarget.style.borderColor = '#71717a'; }}
-                onBlur={(e)  => { e.currentTarget.style.borderColor = '#27272a'; }}
+                onBlur={(e)  => { e.currentTarget.style.borderColor = errors.email ? '#ef4444' : '#27272a'; }}
               />
+              {/* Email error */}
+              {errors.email && (
+                <p style={{ color: '#ef4444', fontSize: '12px', margin: 0 }}>
+                  {errors.email[0]}
+                </p>
+              )}
             </div>
 
             {/* Password */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <label
-                  style={{
-                    color: 'white',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                  }}
-                >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label style={{ color: 'white', fontSize: '14px', fontWeight: '500' }}>
                   Password
                 </label>
                 <a
-                 href="#"
-                  style={{
-                    color: '#71717a',
-                    fontSize: '13px',
-                    textDecoration: 'none',
-                    transition: 'color 0.15s',
-                  }}
+                  href="#"
+                  style={{ color: '#71717a', fontSize: '13px', textDecoration: 'none' }}
                   onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
                   onMouseLeave={(e) => { e.currentTarget.style.color = '#71717a'; }}
                 >
@@ -187,7 +235,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 style={{
                   backgroundColor: '#0a0a0a',
-                  border: '1px solid #27272a',
+                  border: `1px solid ${errors.password ? '#ef4444' : '#27272a'}`,
                   borderRadius: '8px',
                   padding: '12px 14px',
                   color: 'white',
@@ -197,13 +245,20 @@ export default function LoginPage() {
                   boxSizing: 'border-box',
                 }}
                 onFocus={(e) => { e.currentTarget.style.borderColor = '#71717a'; }}
-                onBlur={(e)  => { e.currentTarget.style.borderColor = '#27272a'; }}
+                onBlur={(e)  => { e.currentTarget.style.borderColor = errors.password ? '#ef4444' : '#27272a'; }}
               />
-            </div>
+              {/* Password error */}
+              {errors.password && (
+                <p style={{ color: '#ef4444', fontSize: '12px', margin: 0 }}>
+                  {errors.password[0]}
+                </p>
+              )}
+              </div>
 
             {/* Login Button */}
             <button
               onClick={handleLogin}
+              disabled={loading}
               style={{
                 width: '100%',
                 padding: '12px',
@@ -213,14 +268,14 @@ export default function LoginPage() {
                 borderRadius: '8px',
                 fontSize: '14px',
                 fontWeight: '600',
-                cursor: 'pointer',
-                marginTop: '4px',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.7 : 1,
                 transition: 'background 0.15s',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#e4e4e7'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'white'; }}
+              onMouseEnter={(e) => { if (!loading) e.currentTarget.style.backgroundColor = '#e4e4e7'; }}
+              onMouseLeave={(e) => { if (!loading) e.currentTarget.style.backgroundColor = 'white'; }}
             >
-              Login
+              {loading ? 'Logging in...' : 'Login'}
             </button>
 
             {/* Divider */}
