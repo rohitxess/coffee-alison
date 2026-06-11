@@ -34,7 +34,34 @@ export default function GalleryPage() {
   const [progress, setProgress]   = useState(0);
   const [mounted, setMounted]     = useState(false);
   const [selected, setSelected]   = useState<Photo | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const inputRef                  = useRef<HTMLInputElement>(null);
+
+  // for keyboard navigation in lightbox
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedIndex === null) return;
+  
+      if (e.key === 'ArrowLeft') {
+        setSelectedIndex((prev) =>
+          prev !== null ? (prev === 0 ? photos.length - 1 : prev - 1) : null
+        );
+      }
+      if (e.key === 'ArrowRight') {
+        setSelectedIndex((prev) =>
+          prev !== null ? (prev === photos.length - 1 ? 0 : prev + 1) : null
+        );
+      }
+      if (e.key === 'Escape') {
+        setSelectedIndex(null);
+      }
+    };
+  
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [selectedIndex, photos.length]);
+
 
   useEffect(() => {
     setMounted(true);
@@ -239,7 +266,7 @@ export default function GalleryPage() {
               gap: '16px',
             }}
           >
-            {photos.map((photo) => (
+            {photos.map((photo, index) => (
               <div
                 key={photo.id}
                 style={{
@@ -251,7 +278,7 @@ export default function GalleryPage() {
                   cursor: 'pointer',
                   backgroundColor: '#fafafa',
                 }}
-                onClick={() => setSelected(photo)}
+                onClick={() => setSelectedIndex(index)}
               >
                 <img
                   src={photo.url}
@@ -321,67 +348,153 @@ export default function GalleryPage() {
       </div>
 
       {/* Lightbox — click photo to expand */}
-      {selected && (
-        <div
-          onClick={() => setSelected(null)}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.85)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 9999,
-            padding: '24px',
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              position: 'relative',
-              maxWidth: '80vw',
-              maxHeight: '80vh',
-              borderRadius: '16px',
-              overflow: 'hidden',
-            }}
-          >
-            <img
-              src={selected.url}
-              alt={selected.name}
-              style={{
-                maxWidth: '80vw',
-                maxHeight: '80vh',
-                objectFit: 'contain',
-                display: 'block',
-              }}
-            />
-            {/* Close button */}
-            <button
-              onClick={() => setSelected(null)}
-              style={{
-                position: 'absolute',
-                top: '12px',
-                right: '12px',
-                backgroundColor: 'rgba(0,0,0,0.6)',
-                border: 'none',
-                borderRadius: '50%',
-                width: '32px',
-                height: '32px',
-                cursor: 'pointer',
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Lightbox */}
+{selectedIndex !== null && photos[selectedIndex] && (
+  <div
+    onClick={() => setSelectedIndex(null)}
+    style={{
+      position: 'fixed',
+      inset: '0',
+      backgroundColor: 'rgba(0,0,0,0.9)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 9999,
+      padding: '24px',
+    }}
+  >
+    {/* Left Arrow */}
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        setSelectedIndex((prev) =>
+          prev !== null ? (prev === 0 ? photos.length - 1 : prev - 1) : null
+        );
+      }}
+      style={{
+        position: 'fixed',
+        left: '20px',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        backgroundColor: 'rgba(255,255,255,0.15)',
+        border: 'none',
+        borderRadius: '50%',
+        width: '48px',
+        height: '48px',
+        cursor: 'pointer',
+        color: 'white',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 10000,
+        transition: 'background 0.15s',
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.3)'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)'; }}
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+
+    {/* Image */}
+    <div
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        position: 'relative',
+        maxWidth: '80vw',
+        maxHeight: '80vh',
+        borderRadius: '16px',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '12px',
+      }}
+    >
+      <img
+        src={photos[selectedIndex].url}
+        alt={photos[selectedIndex].name}
+        style={{
+          maxWidth: '80vw',
+          maxHeight: '75vh',
+          objectFit: 'contain',
+          display: 'block',
+          borderRadius: '12px',
+        }}
+      />
+
+      {/* Photo name + counter */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <p style={{ color: 'white', fontSize: '14px', margin: 0, fontWeight: '500' }}>
+          {photos[selectedIndex].name}
+        </p>
+        <p style={{ color: '#71717a', fontSize: '13px', margin: 0 }}>
+          {selectedIndex + 1} / {photos.length}
+        </p>
+      </div>
+
+      {/* Close button */}
+      <button
+        onClick={() => setSelectedIndex(null)}
+        style={{
+          position: 'absolute',
+          top: '12px',
+          right: '12px',
+          backgroundColor: 'rgba(0,0,0,0.6)',
+          border: 'none',
+          borderRadius: '50%',
+          width: '32px',
+          height: '32px',
+          cursor: 'pointer',
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    {/* Right Arrow */}
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        setSelectedIndex((prev) =>
+          prev !== null ? (prev === photos.length - 1 ? 0 : prev + 1) : null
+        );
+      }}
+      style={{
+        position: 'fixed',
+        right: '20px',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        backgroundColor: 'rgba(255,255,255,0.15)',
+        border: 'none',
+        borderRadius: '50%',
+        width: '48px',
+        height: '48px',
+        cursor: 'pointer',
+        color: 'white',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 10000,
+        transition: 'background 0.15s',
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.3)'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)'; }}
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </button>
+  </div>
+)}
     </div>
   );
 }

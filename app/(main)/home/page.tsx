@@ -7,6 +7,7 @@ const cards = [
   { emoji: '📅', title: 'Last meetup',        desc: 'You last had coffee 3 days ago.',       color: '#ede9fe', border: '#8b5cf6' },
   { emoji: '💬', title: 'Responses',          desc: 'You have responded 5 times so far.',    color: '#dcfce7', border: '#22c55e' },
   { emoji: '❤️', title: 'Made with love',     desc: 'This app was made just for you!',       color: '#ffe4e6', border: '#f43f5e' },
+  { emoji: '❤️', title: 'Dont make here mad!',     desc: 'Pickup her call!',                 color: '#99B0B0', border: '#99B0B0' },
 ];
 
 export default function HomePage() {
@@ -17,10 +18,10 @@ export default function HomePage() {
       {/* Page Header */}
       <div style={{ marginBottom: '32px' }}>
         <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#09090b', margin: 0 }}>
-          Welcome back! 👋
+          Welcome back!! Aunty Alison
         </h1>
         <p style={{ color: '#71717a', fontSize: '15px', marginTop: '6px' }}>
-          Here's what's happening with your coffee plans.
+          Here's what's happening.
         </p>
       </div>
 

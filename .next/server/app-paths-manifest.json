@@ -1,9 +1,7 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/page": "app/page.js",
-  "/api/auth/login/route": "app/api/auth/login/route.js",
-  "/(main)/coffee/page": "app/(main)/coffee/page.js",
   "/(main)/notes/page": "app/(main)/notes/page.js",
+  "/(main)/wishlist/page": "app/(main)/wishlist/page.js",
+  "/(main)/coffee/page": "app/(main)/coffee/page.js",
   "/(main)/gallery/page": "app/(main)/gallery/page.js",
   "/(main)/home/page": "app/(main)/home/page.js"
 }
