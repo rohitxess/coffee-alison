@@ -146,7 +146,7 @@ export default function CoffeePage() {
           }}
         >
           <Card
-            question="Coffee this week?"
+            question="Coffee Shawttyy?"
             answer={answer}
             response={answer ? responses[answer] : undefined}
             onReset={reset}

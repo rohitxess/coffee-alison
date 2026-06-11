@@ -141,7 +141,7 @@ export default function GalleryPage() {
       >
         <div>
           <h1 style={{ fontSize: '24px', fontWeight: '800', color: '#09090b', margin: '0 0 4px 0' }}>
-            🖼️ Gallery
+            Gallery
           </h1>
           <p style={{ color: '#71717a', fontSize: '14px', margin: 0 }}>
             {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
