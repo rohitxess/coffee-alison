@@ -381,6 +381,54 @@ export default function ProfilePage() {
               onBlur={(e)  => { e.currentTarget.style.borderColor = '#e4e4e7'; }}
             />
           </div>
+          
+          {/* Birthday */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <label style={{ fontSize: '13px', fontWeight: '600', color: '#09090b' }}>
+              Special Day 🎉
+            </label>
+            <input
+              type="text"
+              defaultValue="5th August"
+              style={{
+                padding: '10px 12px',
+                borderRadius: '10px',
+                border: '1.5px solid #e4e4e7',
+                fontSize: '14px',
+                color: '#09090b',
+                outline: 'none',
+                backgroundColor: '#fafafa',
+                boxSizing: 'border-box',
+                width: '100%',
+              }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = '#2563eb'; }}
+              onBlur={(e)  => { e.currentTarget.style.borderColor = '#e4e4e7'; }}
+            />
+          </div>
+
+          {/* Gender */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <label style={{ fontSize: '13px', fontWeight: '600', color: '#09090b' }}>
+              Gender
+            </label>
+            <input
+              type="text"
+              defaultValue="Female"
+              style={{
+                padding: '10px 12px',
+                borderRadius: '10px',
+                border: '1.5px solid #e4e4e7',
+                fontSize: '14px',
+                color: '#09090b',
+                outline: 'none',
+                backgroundColor: '#fafafa',
+                boxSizing: 'border-box',
+                width: '100%',
+              }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = '#2563eb'; }}
+              onBlur={(e)  => { e.currentTarget.style.borderColor = '#e4e4e7'; }}
+            />
+          </div>
         </div>
 
         {/* Save Button */}

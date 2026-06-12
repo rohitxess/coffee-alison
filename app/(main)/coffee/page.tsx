@@ -157,6 +157,23 @@ export default function CoffeePage() {
             <Button variant="annoying" onClick={() => handleClick('annoying')}>Yes, but you are annoying</Button>
           </Card>
         </div>
+        
+        {/* custom reponse sent to the phone */}
+
+        <div
+       className="relative z-10 rounded-3xl p-8"
+       style={{
+         backgroundColor: 'white',
+         border: '2px solid #d1d5db',   
+         borderRadius: '24px',          
+         boxShadow: '0 4px 24px rgba(0,0,0,0.10)',
+       }}
+        >
+          <input type="text" placeholder='Enter your reponse here' />
+        </div>
+        <>
+        <button>Send</button>
+        </>
       </div>
 
       <style>{`

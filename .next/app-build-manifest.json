@@ -21,25 +21,25 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(main)/layout.js"
     ],
+    "/(main)/poetry/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(main)/poetry/page.js"
+    ],
     "/(main)/coffee/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(main)/coffee/page.js"
-    ],
-    "/(main)/notes/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(main)/notes/page.js"
     ],
     "/(main)/gallery/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(main)/gallery/page.js"
     ],
-    "/(main)/settings/page": [
+    "/(main)/notes/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(main)/settings/page.js"
+      "static/chunks/app/(main)/notes/page.js"
     ],
     "/(main)/profile/page": [
       "static/chunks/webpack.js",
@@ -50,6 +50,16 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(main)/wishlist/page.js"
+    ],
+    "/(main)/books/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(main)/books/page.js"
+    ],
+    "/(main)/settings/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(main)/settings/page.js"
     ]
   }
 }

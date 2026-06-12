@@ -505,6 +505,9 @@ video {
 .visible {
   visibility: visible;
 }
+.collapse {
+  visibility: collapse;
+}
 .fixed {
   position: fixed;
 }
@@ -528,6 +531,9 @@ video {
 }
 .flex {
   display: flex;
+}
+.table {
+  display: table;
 }
 .grid {
   display: grid;

@@ -7,7 +7,7 @@ const cards = [
   { emoji: '📅', title: 'Last meetup',        desc: 'You last had coffee 3 days ago.',       color: '#ede9fe', border: '#8b5cf6' },
   { emoji: '💬', title: 'Responses',          desc: 'You have responded 5 times so far.',    color: '#dcfce7', border: '#22c55e' },
   { emoji: '❤️', title: 'Made with love',     desc: 'This app was made just for you!',       color: '#ffe4e6', border: '#f43f5e' },
-  { emoji: '❤️', title: 'Dont make here mad!',     desc: 'Pickup her call!',                 color: '#99B0B0', border: '#99B0B0' },
+  { emoji: '❤️', title: 'Dont make her mad!',     desc: 'Pickup her call!',                 color: '#99B0B0', border: '#99B0B0' },
 ];
 
 export default function HomePage() {
