@@ -1,6 +1,11 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { db, storage } from '@/lib/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+
+const PROFILE_DOC_ID = 'main-profile'; // single profile document
 
 export default function ProfilePage() {
   const [coverImage, setCoverImage]     = useState<string | null>(null);
@@ -8,29 +13,124 @@ export default function ProfilePage() {
   const [firstName, setFirstName]       = useState('Alison');
   const [lastName, setLastName]         = useState('Lu');
   const [username, setUsername]         = useState('@alison');
+  const [location, setLocation]         = useState('Sydney, Australia');
+  const [specialDay, setspecialDay]     = useState('5th August');
+  const [gender, setGender]             = useState('Female');
   const [saved, setSaved]               = useState(false);
+  const [saving, setSaving]             = useState(false);
+  const [loading, setLoading]           = useState(true);
+  const [uploadingCover, setUploadingCover]     = useState(false);
+  const [uploadingProfile, setUploadingProfile] = useState(false);
 
   const coverRef   = useRef<HTMLInputElement>(null);
   const profileRef = useRef<HTMLInputElement>(null);
 
-  const handleCoverUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Load profile from Firestore on mount
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const docRef  = doc(db, 'profile', PROFILE_DOC_ID);
+        const snapshot = await getDoc(docRef);
+
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          setFirstName(data.firstName || 'Alison');
+          setLastName(data.lastName || 'Lu');
+          setUsername(data.username || '@alison');
+          setLocation(data.location || 'Sydney, Australia');
+          setspecialDay(data.specialDay || '5th August');
+          setGender(data.gender || 'Female');
+          setCoverImage(data.coverImage || null);
+          setProfileImage(data.profileImage || null);
+        }
+      } catch (e: any) {
+        console.error('❌ Error loading profile:', e.message);
+      }
+      setLoading(false);
+    };
+
+    loadProfile();
+  }, []);
+
+  // Upload cover image to Storage and update state
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setCoverImage(url);
+
+    setUploadingCover(true);
+    try {
+      const storageRef = ref(storage, `profile/cover_${Date.now()}_${file.name}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      setCoverImage(url);
+      console.log('✅ Cover uploaded!');
+    } catch (e: any) {
+      console.error('❌ Cover upload error:', e.message);
+    }
+    setUploadingCover(false);
   };
 
-  const handleProfileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Upload profile picture to Storage and update state
+  const handleProfileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setProfileImage(url);
+
+    setUploadingProfile(true);
+    try {
+      const storageRef = ref(storage, `profile/avatar_${Date.now()}_${file.name}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      setProfileImage(url);
+      console.log('✅ Profile picture uploaded!');
+    } catch (e: any) {
+      console.error('❌ Profile upload error:', e.message);
+    }
+    setUploadingProfile(false);
   };
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  // Save all profile data to Firestore
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await setDoc(doc(db, 'profile', PROFILE_DOC_ID), {
+        firstName,
+        lastName,
+        username,
+        location,
+        specialDay,
+        gender,
+        coverImage:   coverImage   || null,
+        profileImage: profileImage || null,
+        updatedAt: new Date(),
+      });
+
+      console.log('✅ Profile saved!');
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (e: any) {
+      console.error('❌ Save error:', e.message);
+    }
+    setSaving(false);
   };
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          height: '100%',
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#f4f4f5',
+          color: '#71717a',
+          fontSize: '14px',
+        }}
+      >
+        Loading profile...
+      </div>
+    );
+  }
 
   return (
     <div
@@ -43,6 +143,7 @@ export default function ProfilePage() {
         boxSizing: 'border-box',
       }}
     >
+
       {/* ── CARD 1 — Cover + Profile Picture + Name ── */}
       <div
         style={{
@@ -66,7 +167,6 @@ export default function ProfilePage() {
           }}
           onClick={() => coverRef.current?.click()}
         >
-          {/* Cover upload hint */}
           <div
             style={{
               position: 'absolute',
@@ -90,12 +190,18 @@ export default function ProfilePage() {
               e.currentTarget.style.color = 'transparent';
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="17 8 12 3 7 8"/>
-              <line x1="12" y1="3" x2="12" y2="15"/>
-            </svg>
-            Change cover
+            {uploadingCover ? (
+              <span style={{ color: 'white' }}>Uploading...</span>
+            ) : (
+              <>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                Change cover
+              </>
+            )}
           </div>
 
           <input
@@ -106,7 +212,6 @@ export default function ProfilePage() {
             style={{ display: 'none' }}
           />
 
-          {/* Three dot menu */}
           <button
             style={{
               position: 'absolute',
@@ -123,6 +228,7 @@ export default function ProfilePage() {
               justifyContent: 'center',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
+            onClick={(e) => e.stopPropagation()}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <circle cx="12" cy="5" r="1.5"/>
@@ -156,11 +262,14 @@ export default function ProfilePage() {
                 boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               }}
             >
-              {!profileImage && (
+              {!profileImage && !uploadingProfile && (
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                   <circle cx="12" cy="7" r="4"/>
                 </svg>
+              )}
+              {uploadingProfile && (
+                <span style={{ fontSize: '11px', color: '#71717a' }}>Uploading...</span>
               )}
             </div>
 
@@ -203,12 +312,12 @@ export default function ProfilePage() {
           </h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
             <span>🇦🇺</span>
-            <span style={{ color: '#71717a', fontSize: '14px' }}>Sydney, Australia</span>
+            <span style={{ color: '#71717a', fontSize: '14px' }}>{location}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
             <span style={{ color: '#71717a', fontSize: '14px' }}>{username}</span>
             <span style={{ color: '#d4d4d8' }}>•</span>
-            <span style={{ color: '#09090b', fontSize: '14px', fontWeight: '600' }}>Tech</span>
+            <span style={{ color: '#09090b', fontSize: '14px', fontWeight: '600' }}>Baddiee in Tech</span>
             <span style={{ color: '#d4d4d8' }}>•</span>
             <span style={{ color: '#71717a', fontSize: '14px' }}>Full-time</span>
           </div>
@@ -365,7 +474,8 @@ export default function ProfilePage() {
             </label>
             <input
               type="text"
-              defaultValue="Sydney, Australia"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
               style={{
                 padding: '10px 12px',
                 borderRadius: '10px',
@@ -381,15 +491,16 @@ export default function ProfilePage() {
               onBlur={(e)  => { e.currentTarget.style.borderColor = '#e4e4e7'; }}
             />
           </div>
-          
-          {/* Birthday */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+
+           {/* Speical Day */}
+           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <label style={{ fontSize: '13px', fontWeight: '600', color: '#09090b' }}>
               Special Day 🎉
             </label>
             <input
               type="text"
-              defaultValue="5th August"
+              value={specialDay}
+              onChange={(e) => setspecialDay(e.target.value)}
               style={{
                 padding: '10px 12px',
                 borderRadius: '10px',
@@ -406,14 +517,15 @@ export default function ProfilePage() {
             />
           </div>
 
-          {/* Gender */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+           {/* Gender */}
+           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <label style={{ fontSize: '13px', fontWeight: '600', color: '#09090b' }}>
               Gender
             </label>
             <input
               type="text"
-              defaultValue="Female"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
               style={{
                 padding: '10px 12px',
                 borderRadius: '10px',
@@ -429,11 +541,13 @@ export default function ProfilePage() {
               onBlur={(e)  => { e.currentTarget.style.borderColor = '#e4e4e7'; }}
             />
           </div>
+        
         </div>
 
         {/* Save Button */}
         <button
           onClick={handleSave}
+          disabled={saving}
           style={{
             padding: '10px 24px',
             backgroundColor: saved ? '#22c55e' : '#09090b',
@@ -442,16 +556,17 @@ export default function ProfilePage() {
             borderRadius: '10px',
             fontSize: '14px',
             fontWeight: '600',
-            cursor: 'pointer',
+            cursor: saving ? 'not-allowed' : 'pointer',
+            opacity: saving ? 0.7 : 1,
             transition: 'all 0.15s',
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
           }}
-          onMouseEnter={(e) => { if (!saved) e.currentTarget.style.backgroundColor = '#27272a'; }}
-          onMouseLeave={(e) => { if (!saved) e.currentTarget.style.backgroundColor = '#09090b'; }}
+          onMouseEnter={(e) => { if (!saved && !saving) e.currentTarget.style.backgroundColor = '#27272a'; }}
+          onMouseLeave={(e) => { if (!saved && !saving) e.currentTarget.style.backgroundColor = '#09090b'; }}
         >
-          {saved ? 'Saved!' : 'Save Changes'}
+          {saving ? 'Saving...' : saved ? '✅ Saved!' : 'Save Changes'}
         </button>
       </div>
     </div>

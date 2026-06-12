@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}"
+self.__REACT_LOADABLE_MANIFEST="{\"app/(main)/holiday/page.tsx -> @/ui/holidayMap\":{\"id\":\"app/(main)/holiday/page.tsx -> @/ui/holidayMap\",\"files\":[\"static/css/_app-pages-browser_ui_holidayMap_tsx.css\",\"static/chunks/_app-pages-browser_ui_holidayMap_tsx.js\"]}}"

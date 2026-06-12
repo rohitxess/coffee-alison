@@ -7,13 +7,22 @@ const client = twilio(
 );
 
 export async function POST(req: Request) {
-  const { answer } = await req.json();
 
-  await client.messages.create({
-    body: `Shawttyyy — New response: "${answer}"`,
-    from: process.env.TWILIO_PHONE_NUMBER,
-    to: process.env.MY_PHONE_NUMBER!,
-  });
+  try{
+    const { answer } = await req.json();
 
-  return NextResponse.json({ success: true });
+    const message = await client.messages.create({
+      body: `Shawttyyy — New response: "${answer}"`,
+      from: process.env.TWILIO_PHONE_NUMBER,
+      to: process.env.MY_PHONE_NUMBER!,
+    });
+  
+  
+    console.log('SMS sent! SID:', message.sid);
+    return NextResponse.json({ success: true });
+  } catch(e: any){
+
+    console.error('Error sending SMS:', e);
+    return NextResponse.json({ success: false, error: e.message}, {status: 500});
+  }
 }

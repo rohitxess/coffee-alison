@@ -1,8 +1,8 @@
 {
-  "/(main)/profile/page": "app/(main)/profile/page.js",
-  "/(main)/coffee/page": "app/(main)/coffee/page.js",
-  "/(main)/settings/page": "app/(main)/settings/page.js",
+  "/api/notify/route": "app/api/notify/route.js",
+  "/page": "app/page.js",
   "/(main)/books/page": "app/(main)/books/page.js",
+  "/(main)/poetry/page": "app/(main)/poetry/page.js",
   "/(main)/home/page": "app/(main)/home/page.js",
-  "/(main)/notes/page": "app/(main)/notes/page.js"
+  "/(main)/coffee/page": "app/(main)/coffee/page.js"
 }

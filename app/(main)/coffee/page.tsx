@@ -26,8 +26,40 @@ const responses: Record<NonNullable<AnswerType>, { emoji: string; message: strin
 export default function CoffeePage() {
   const [answer, setAnswer]   = useState<AnswerType>(null);
   const [mounted, setMounted] = useState(false);
+  const [customMessage, setCustomMessage] = useState(''); 
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
+
+  const handleSendCustom = async () => {
+    if (!customMessage.trim()) return;
+    setSending(true);
+  
+    try {
+      await fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answer: customMessage.trim() }),
+      });
+  
+      console.log('✅ Custom message sent!');
+      setSent(true);
+      setCustomMessage('');
+      setTimeout(() => setSent(false), 2000);
+    } catch (e) {
+      console.error('❌ Error sending message:', e);
+    }
+  
+    setSending(false);
+  };
+  
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSendCustom();
+    }
+  };
+
 
   const saveToFirebase = async (ans: string) => {
     try {
@@ -160,20 +192,84 @@ export default function CoffeePage() {
         
         {/* custom reponse sent to the phone */}
 
-        <div
-       className="relative z-10 rounded-3xl p-8"
-       style={{
-         backgroundColor: 'white',
-         border: '2px solid #d1d5db',   
-         borderRadius: '24px',          
-         boxShadow: '0 4px 24px rgba(0,0,0,0.10)',
-       }}
-        >
-          <input type="text" placeholder='Enter your reponse here' />
-        </div>
+          {/* Custom Message Input */}
+<div
+  style={{
+    width: '100%',
+    maxWidth: '440px',
+    marginTop: '16px',
+    boxSizing: 'border-box',
+  }}
+>
+  <div
+    style={{
+      display: 'flex',
+      gap: '8px',
+      backgroundColor: '#fafafa',
+      border: '1.5px solid #e4e4e7',
+      borderRadius: '12px',
+      padding: '8px',
+    }}
+  >
+    <input
+      type="text"
+      placeholder="Type your own message..."
+      value={customMessage}
+      onChange={(e) => setCustomMessage(e.target.value)}
+      onKeyDown={handleKeyPress}
+      style={{
+        flex: 1,
+        border: 'none',
+        backgroundColor: 'transparent',
+        outline: 'none',
+        fontSize: '14px',
+        color: '#09090b',
+        padding: '8px 12px',
+      }}
+    />
+
+    {/* Send Button */}
+    <button
+      onClick={handleSendCustom}
+      disabled={sending || !customMessage.trim()}
+      style={{
+        padding: '8px 20px',
+        backgroundColor: sent ? '#22c55e' : '#09090b',
+        color: 'white',
+        border: 'none',
+        borderRadius: '8px',
+        fontSize: '14px',
+        fontWeight: '600',
+        cursor: sending ? 'not-allowed' : 'pointer',
+        opacity: !customMessage.trim() ? 0.5 : 1,
+        transition: 'all 0.15s',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        whiteSpace: 'nowrap',
+      }}
+      onMouseEnter={(e) => { if (!sent && customMessage.trim()) e.currentTarget.style.backgroundColor = '#27272a'; }}
+      onMouseLeave={(e) => { if (!sent && customMessage.trim()) e.currentTarget.style.backgroundColor = '#09090b'; }}
+    >
+      {sending ? (
+        'Sending...'
+      ) : sent ? (
+        '✅ Sent!'
+      ) : (
         <>
-        <button>Send</button>
+          Send
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
         </>
+      )}
+    </button>
+  </div>
+</div>
+
+     
+        
       </div>
 
       <style>{`
