@@ -1,7 +1,8 @@
 {
+  "/page": "app/page.js",
   "/(main)/books/page": "app/(main)/books/page.js",
-  "/(main)/notes/page": "app/(main)/notes/page.js",
+  "/(main)/poetry/page": "app/(main)/poetry/page.js",
   "/(main)/holiday/page": "app/(main)/holiday/page.js",
-  "/(main)/coffee/page": "app/(main)/coffee/page.js",
-  "/(main)/poetry/page": "app/(main)/poetry/page.js"
+  "/(main)/notes/page": "app/(main)/notes/page.js",
+  "/(main)/coffee/page": "app/(main)/coffee/page.js"
 }
