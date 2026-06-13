@@ -1,4 +1,10 @@
 {
+  "app/(main)/gallery/page.tsx -> heic2any": {
+    "id": "app/(main)/gallery/page.tsx -> heic2any",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_heic2any_dist_heic2any_js.js"
+    ]
+  },
   "app/(main)/holiday/page.tsx -> @/ui/holidayMap": {
     "id": "app/(main)/holiday/page.tsx -> @/ui/holidayMap",
     "files": [

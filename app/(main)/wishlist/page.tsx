@@ -194,10 +194,10 @@ export default function WishlistPage() {
           </div>
         </div>
 
-        {/* Description */}
+        {/* Description
         <p style={{ color: '#a1a1aa', fontSize: '13px', margin: '4px 0 0 0' }}>
           Add description...
-        </p>
+        </p> */}
 
         {/* Divider */}
         <div style={{ height: '1px', backgroundColor: '#f4f4f5', marginTop: '16px' }} />

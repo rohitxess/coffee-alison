@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -20,6 +18,7 @@ import {
   getDownloadURL,
   deleteObject,
 } from 'firebase/storage';
+// import heic2any from 'heic2any';
 
 type Photo = {
   id: string;
@@ -36,6 +35,7 @@ export default function GalleryPage() {
   const [selected, setSelected]   = useState<Photo | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const inputRef                  = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);  
 
   // for keyboard navigation in lightbox
 
@@ -76,55 +76,99 @@ export default function GalleryPage() {
     return () => unsubscribe();
   }, []);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Only allow jpeg and png
-    if (!['image/jpeg', 'image/png'].includes(file.type)) {
-      alert('Only JPEG and PNG files are allowed!');
+  const processFiles = async (files: File[]) => {
+    const validFiles = files.filter((file) => {
+      const isHeic = file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/heif'];
+      return allowedTypes.includes(file.type) || isHeic;
+    });
+  
+    if (validFiles.length === 0) {
+      alert('Only JPEG, PNG, and HEIC files are allowed!');
       return;
     }
-
+  
     setUploading(true);
-    setProgress(0);
-
-    try {
-      // Upload to Firebase Storage
-      const storageRef  = ref(storage, `gallery/${Date.now()}_${file.name}`);
-      const uploadTask  = uploadBytesResumable(storageRef, file);
-
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-          setProgress(pct);
-        },
-        (error) => {
-          console.error('❌ Upload error:', error.message);
-          setUploading(false);
-        },
-        async () => {
-          // Get download URL and save to Firestore
-          const url = await getDownloadURL(uploadTask.snapshot.ref);
-          await addDoc(collection(db, 'gallery'), {
-            url,
-            name: file.name,
-            createdAt: new Date(),
-          });
-          console.log('✅ Photo uploaded!');
-          setUploading(false);
-          setProgress(0);
+  
+    for (let i = 0; i < validFiles.length; i++) {
+      const file = validFiles[i];
+      const isHeic = file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
+  
+      try {
+        let uploadFile: File | Blob = file;
+        let fileName = file.name;
+  
+        if (isHeic) {
+          const heic2any = (await import('heic2any')).default;
+          const converted = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 });
+          uploadFile = Array.isArray(converted) ? converted[0] : converted;
+          fileName = file.name.replace(/\.(heic|heif)$/i, '.jpg');
         }
-      );
-    } catch (e: any) {
-      console.error('❌ Error:', e.message);
-      setUploading(false);
+  
+        const storageRef = ref(storage, `gallery/${Date.now()}_${fileName}`);
+        const uploadTask  = uploadBytesResumable(storageRef, uploadFile);
+  
+        await new Promise<void>((resolve, reject) => {
+          uploadTask.on(
+            'state_changed',
+            (snapshot) => {
+              const filePct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+              const overall = Math.round(((i + filePct / 100) / validFiles.length) * 100);
+              setProgress(overall);
+            },
+            (error) => {
+              console.error(`Error uploading ${fileName}:`, error.message);
+              reject(error);
+            },
+            async () => {
+              const url = await getDownloadURL(uploadTask.snapshot.ref);
+              await addDoc(collection(db, 'gallery'), {
+                url,
+                name: fileName,
+                createdAt: new Date(),
+              });
+              console.log(`✅ Uploaded: ${fileName}`);
+              resolve();
+            }
+          );
+        });
+      } catch (e: any) {
+        console.error(`Failed: ${file.name}`, e.message);
+      }
     }
-
-    // Reset input
+  
+    setUploading(false);
+    setProgress(0);
+  };
+  
+  // File input handler — supports multiple files
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    await processFiles(files);
     if (inputRef.current) inputRef.current.value = '';
   };
+  
+  // Drag and drop handlers
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+  
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+  
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length === 0) return;
+    await processFiles(files);
+  };
+
 
   const handleDelete = async (photo: Photo) => {
     try {
@@ -134,10 +178,10 @@ export default function GalleryPage() {
 
       // Delete from Firestore
       await deleteDoc(doc(db, 'gallery', photo.id));
-      console.log('✅ Photo deleted!');
+      console.log('Photo deleted!');
       if (selected?.id === photo.id) setSelected(null);
     } catch (e: any) {
-      console.error('❌ Delete error:', e.message);
+      console.error('Delete error:', e.message);
     }
   };
 
@@ -145,6 +189,9 @@ export default function GalleryPage() {
 
   return (
     <div
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
       style={{
         height: '100%',
         width: '100%',
@@ -153,8 +200,40 @@ export default function GalleryPage() {
         flexDirection: 'column',
         boxSizing: 'border-box',
         overflow: 'hidden',
+        position: 'relative',
       }}
     >
+
+      {/* Drag overlay */}
+    {isDragging && (
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundColor: 'rgba(9,9,11,0.85)',
+          zIndex: 9999,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '16px',
+          border: '3px dashed white',
+          margin: '8px',
+          borderRadius: '16px',
+          pointerEvents: 'none',
+        }}
+      >
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        <p style={{ color: 'white', fontSize: '18px', fontWeight: '700', margin: 0 }}>
+          Drop photos to upload
+        </p>
+      </div>
+    )}
+
       {/* Header */}
       <div
         style={{
@@ -180,7 +259,7 @@ export default function GalleryPage() {
           <input
             ref={inputRef}
             type="file"
-            accept="image/jpeg,image/png"
+            accept="image/jpeg,image/png,image/heic,image/heif,.heic,.heif"
             onChange={handleUpload}
             style={{ display: 'none' }}
           />
