@@ -9,10 +9,14 @@ const client = twilio(
 export async function POST(req: Request) {
 
   try{
-    const { answer } = await req.json();
+    const { answer,dateTime } = await req.json();
+
+    const body = dateTime
+    ? `Shawttyyy — New response: "${answer}"\n${dateTime}`
+    : `Shawttyyy — New response: "${answer}"`;
 
     const message = await client.messages.create({
-      body: `Shawttyyy — New response: "${answer}"`,
+      body,
       from: process.env.TWILIO_PHONE_NUMBER,
       to: process.env.MY_PHONE_NUMBER!,
     });

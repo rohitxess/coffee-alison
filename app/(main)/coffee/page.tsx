@@ -30,28 +30,24 @@ export default function CoffeePage() {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
+  //modal states
+
+  const [showDateModal, setShowDateModal] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
+  const [sendingFinal, setSendingFinal] = useState(false);
+  
+
   useEffect(() => { setMounted(true); }, []);
 
   const handleSendCustom = async () => {
     if (!customMessage.trim()) return;
-    setSending(true);
-  
-    try {
-      await fetch('/api/notify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answer: customMessage.trim() }),
-      });
-  
-      console.log('✅ Custom message sent!');
-      setSent(true);
-      setCustomMessage('');
-      setTimeout(() => setSent(false), 2000);
-    } catch (e) {
-      console.error('❌ Error sending message:', e);
-    }
-  
-    setSending(false);
+   
+    setPendingMessage(customMessage.trim());
+    setSelectedDate('');
+    setSelectedTime('');
+    setShowDateModal(true);
   };
   
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -60,6 +56,59 @@ export default function CoffeePage() {
     }
   };
 
+  
+  const handleConfirmSend = async () => {
+    if (!selectedDate || !selectedTime) return;
+    setSendingFinal(true);
+  
+    try {
+      const formattedDate = new Date(`${selectedDate}T${selectedTime}`).toLocaleString('en-AU', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+  
+      await fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          answer: pendingMessage,
+          dateTime: formattedDate,
+        }),
+      });
+  
+      console.log('Message sent with date/time!');
+
+      if (['yes', 'ofcourse', 'annoying', 'no'].includes(pendingMessage)) {
+        setAnswer(pendingMessage as AnswerType);
+        saveToFirebase(pendingMessage).catch((e) => console.error('Firebase error:', e));
+      } else {
+        // It was a custom message
+        setSent(true);
+        setCustomMessage('');
+        setTimeout(() => setSent(false), 2000);
+      }
+  
+      setShowDateModal(false);
+      setSelectedDate('');
+      setSelectedTime('');
+      setPendingMessage('');
+    } catch (e) {
+      console.error('Error sending message:', e);
+    }
+  
+    setSendingFinal(false);
+  };
+  
+  const handleCancelDateModal = () => {
+    setShowDateModal(false);
+    setSelectedDate('');
+    setSelectedTime('');
+    setPendingMessage('');
+  };
 
   const saveToFirebase = async (ans: string) => {
     try {
@@ -74,13 +123,14 @@ export default function CoffeePage() {
 
   const handleClick = (ans: AnswerType) => {
     if (!ans) return;
-    setAnswer(ans);
-    saveToFirebase(ans).catch(console.error);
-    fetch('/api/notify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ answer: ans }),
-    }).catch(console.error);
+    // setAnswer(ans);
+    // saveToFirebase(ans).catch((e) => console.error('Firebase error:', e));
+  
+    // Open date/time modal instead of sending immediately
+    setPendingMessage(ans);
+    setSelectedDate('');
+    setSelectedTime('');
+    setShowDateModal(true);
   };
 
   const reset = () => setAnswer(null);
@@ -90,13 +140,13 @@ export default function CoffeePage() {
   return (
     <div
       style={{
-        height: '100%',               // ← fills layout's main area
+        height: '100%',               
         width: '100%',
         backgroundColor: 'white',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        overflow: 'hidden',           // ← no scroll
+        overflow: 'hidden',           
         boxSizing: 'border-box',
       }}
     >
@@ -117,7 +167,7 @@ export default function CoffeePage() {
               src={gif}
               alt={`gif-${i}`}
               style={{
-                height: '100px',       // ← smaller to save vertical space
+                height: '100px',       
                 width: '100px',
                 objectFit: 'cover',
                 borderRadius: '12px',
@@ -136,7 +186,7 @@ export default function CoffeePage() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',   // ← centers vertically in remaining space
+          justifyContent: 'center',  
           width: '100%',
           padding: '0 16px',
           boxSizing: 'border-box',
@@ -268,7 +318,187 @@ export default function CoffeePage() {
   </div>
 </div>
 
-     
+    {/* new code added */}
+     {/* Date & Time Picker Modal */}
+{showDateModal && (
+  <div
+    onClick={handleCancelDateModal}
+    style={{
+      position: 'fixed',
+      top: 0, left: 0, right: 0, bottom: 0,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 9999,
+      padding: '24px',
+    }}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        backgroundColor: 'white',
+        borderRadius: '16px',
+        padding: '28px',
+        width: '100%',
+        maxWidth: '400px',
+        boxShadow: '0 24px 60px rgba(0,0,0,0.2)',
+      }}
+    >
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#09090b', margin: 0 }}>
+           Pick a date and time
+        </h2>
+        <button
+          onClick={handleCancelDateModal}
+          style={{
+            backgroundColor: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#71717a',
+            display: 'flex',
+            alignItems: 'center',
+            padding: '4px',
+            borderRadius: '6px',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f4f4f5'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      {/* Response preview
+      <p style={{ fontSize: '13px', color: '#71717a', margin: '0 0 20px 0' }}>
+        Pick a date & time 
+      </p> */}
+
+      {/* Fields */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+        {/* Date */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <label style={{ fontSize: '13px', fontWeight: '600', color: '#09090b' }}>
+            Date
+          </label>
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            style={{
+              padding: '10px 12px',
+              borderRadius: '10px',
+              border: '1.5px solid #e4e4e7',
+              fontSize: '14px',
+              color: '#09090b',
+              outline: 'none',
+              backgroundColor: '#fafafa',
+              boxSizing: 'border-box',
+              width: '100%',
+            }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = '#09090b'; }}
+            onBlur={(e)  => { e.currentTarget.style.borderColor = '#e4e4e7'; }}
+          />
+        </div>
+
+        {/* Time */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <label style={{ fontSize: '13px', fontWeight: '600', color: '#09090b' }}>
+            Time
+          </label>
+          <input
+            type="time"
+            value={selectedTime}
+            onChange={(e) => setSelectedTime(e.target.value)}
+            style={{
+              padding: '10px 12px',
+              borderRadius: '10px',
+              border: '1.5px solid #e4e4e7',
+              fontSize: '14px',
+              color: '#09090b',
+              outline: 'none',
+              backgroundColor: '#fafafa',
+              boxSizing: 'border-box',
+              width: '100%',
+            }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = '#09090b'; }}
+            onBlur={(e)  => { e.currentTarget.style.borderColor = '#e4e4e7'; }}
+          />
+        </div>
+
+        {/* Preview of formatted date/time */}
+        {selectedDate && selectedTime && (
+          <div
+            style={{
+              backgroundColor: '#fafafa',
+              border: '1.5px solid #e4e4e7',
+              borderRadius: '10px',
+              padding: '10px 12px',
+              fontSize: '13px',
+              color: '#09090b',
+              fontWeight: '500',
+            }}
+          >
+            🗓️ {new Date(`${selectedDate}T${selectedTime}`).toLocaleString('en-AU', {
+              weekday: 'long',
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </div>
+        )}
+
+        {/* Buttons */}
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '4px' }}>
+          <button
+            onClick={handleCancelDateModal}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: 'white',
+              color: '#09090b',
+              border: '1.5px solid #e4e4e7',
+              borderRadius: '10px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f4f4f5'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'white'; }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleConfirmSend}
+            disabled={sendingFinal || !selectedDate || !selectedTime}
+            style={{
+              padding: '10px 24px',
+              backgroundColor: '#09090b',
+              color: 'white',
+              border: 'none',
+              borderRadius: '10px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: sendingFinal ? 'not-allowed' : 'pointer',
+              opacity: !selectedDate || !selectedTime ? 0.5 : 1,
+              transition: 'all 0.15s',
+            }}
+            onMouseEnter={(e) => { if (selectedDate && selectedTime) e.currentTarget.style.backgroundColor = '#27272a'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#09090b'; }}
+          >
+            {sendingFinal ? 'Sending...' : 'Confirm & Send'}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
         
       </div>
 

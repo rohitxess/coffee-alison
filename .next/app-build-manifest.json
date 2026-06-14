@@ -32,6 +32,16 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(main)/notes/page.js"
     ],
+    "/(main)/gallery/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(main)/gallery/page.js"
+    ],
+    "/(main)/wishlist/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(main)/wishlist/page.js"
+    ],
     "/(main)/poetry/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -47,16 +57,6 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(main)/movies/page.js"
     ],
-    "/(main)/gallery/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(main)/gallery/page.js"
-    ],
-    "/(main)/wishlist/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(main)/wishlist/page.js"
-    ],
     "/(main)/holiday/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -66,6 +66,11 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(main)/profile/page.js"
+    ],
+    "/_not-found/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/_not-found/page.js"
     ]
   }
 }
