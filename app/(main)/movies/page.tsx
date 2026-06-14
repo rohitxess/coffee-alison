@@ -144,7 +144,7 @@ export default function MoviesPage() {
         const data = await res.json();
         setSearchResults(data.results?.slice(0, 8) || []);
       } catch (e: any) {
-        console.error('❌ TMDB search error:', e.message);
+        console.error('TMDB search error:', e.message);
       }
       setSearching(false);
     }, 400);
@@ -199,7 +199,7 @@ export default function MoviesPage() {
       setManualRating(0);
       setShowModal(false);
     } catch (e: any) {
-      console.error('❌ Error:', e.message);
+      console.error('Error:', e.message);
     }
     setSaving(false);
   };

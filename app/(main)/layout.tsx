@@ -25,7 +25,8 @@ function MainContent({ children }: { children: React.ReactNode }) {
         style={{
           flex: 1,
           padding: '32px',
-          overflow: 'hidden',         // ← no scroll inside main
+          // overflow: 'hidden',        
+          overflowY: 'auto',           
           boxSizing: 'border-box',
         }}
       >
