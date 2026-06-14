@@ -19,6 +19,7 @@ type Book = {
   name: string;
   author: string;
   link: string;
+  rating: number;
   createdAt: any;
 };
 
@@ -27,7 +28,7 @@ export default function ReadingListPage() {
   const [mounted, setMounted]   = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<{ type: string; name: string; author: string; link: string }>({
-    type: '', name: '', author: '', link: '',
+    type: '', name: '', author: '', link: '', 
   });
   const [saving, setSaving]     = useState(false);
 
@@ -52,13 +53,22 @@ export default function ReadingListPage() {
         name: 'New book',
         author: '',
         link: '',
+        rating: 0,
         createdAt: new Date(),
       });
     } catch (e: any) {
-      console.error('❌ Error:', e.message);
+      console.error('Error:', e.message);
     }
     setSaving(false);
   };
+
+  const handleRatingChange = async (id: string, rating: number) => {
+    try {
+      await updateDoc(doc(db, 'reading_list', id), {rating});
+    }catch(e: any){
+      console.error('Rating updated Error:', e.message);
+    }
+  }
 
   const handleEdit = (book: Book) => {
     setEditingId(book.id);
@@ -79,7 +89,7 @@ export default function ReadingListPage() {
       });
       setEditingId(null);
     } catch (e: any) {
-      console.error('❌ Update error:', e.message);
+      console.error('Update error:', e.message);
     }
   };
 
@@ -141,7 +151,7 @@ export default function ReadingListPage() {
       >
         <div>
           <h1 style={{ fontSize: '22px', fontWeight: '800', color: 'white', margin: '0 0 4px 0' }}>
-            📚 Reading List
+            Reading List
           </h1>
           <p style={{ color: '#71717a', fontSize: '13px', margin: 0 }}>
             {books.length} {books.length === 1 ? 'book' : 'books'}
@@ -205,7 +215,7 @@ export default function ReadingListPage() {
           {/* Header Row */}
           <thead>
             <tr style={{ backgroundColor: '#000000' }}>
-              <th style={{ ...cellStyle, textAlign: 'left', fontWeight: '600', color: '#a1a1aa', width: '18%' }}>
+              <th style={{ ...cellStyle, textAlign: 'left', fontWeight: '600', color: '#a1a1aa', width: '14%' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="3" y1="6" x2="21" y2="6"/>
@@ -215,7 +225,7 @@ export default function ReadingListPage() {
                   Type
                 </span>
               </th>
-              <th style={{ ...cellStyle, textAlign: 'left', fontWeight: '600', color: '#a1a1aa', width: '32%' }}>
+              <th style={{ ...cellStyle, textAlign: 'left', fontWeight: '600', color: '#a1a1aa', width: '26%' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 7V4h16v3"/>
@@ -225,7 +235,7 @@ export default function ReadingListPage() {
                   Name
                 </span>
               </th>
-              <th style={{ ...cellStyle, textAlign: 'left', fontWeight: '600', color: '#a1a1aa', width: '20%' }}>
+              <th style={{ ...cellStyle, textAlign: 'left', fontWeight: '600', color: '#a1a1aa', width: '18%' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="3" y1="6" x2="21" y2="6"/>
@@ -235,13 +245,22 @@ export default function ReadingListPage() {
                   Author
                 </span>
               </th>
-              <th style={{ ...cellStyle, textAlign: 'left', fontWeight: '600', color: '#a1a1aa', width: '20%' }}>
+              <th style={{ ...cellStyle, textAlign: 'left', fontWeight: '600', color: '#a1a1aa', width: '18%' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
                   </svg>
                   Link
+                </span>
+              </th>
+               {/* rating */}
+               <th style={{ ...cellStyle, textAlign: 'left', fontWeight: '600', color: '#a1a1aa', width: '14%' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  </svg>
+                  Rating
                 </span>
               </th>
               <th style={{ ...cellStyle, width: '40px' }} />
@@ -252,7 +271,7 @@ export default function ReadingListPage() {
           <tbody>
             {books.length === 0 ? (
               <tr>
-                <td colSpan={5} style={{ ...cellStyle, textAlign: 'center', color: '#71717a', padding: '40px' }}>
+                <td colSpan={6} style={{ ...cellStyle, textAlign: 'center', color: '#71717a', padding: '40px' }}>
                   No books yet. Click "Add Book" to get started!
                 </td>
               </tr>
@@ -348,6 +367,37 @@ export default function ReadingListPage() {
                         <span style={{ color: '#52525b' }}>—</span>
                       )}
                     </td>
+
+                      {/* Rating */}
+<td style={cellStyle}>
+  <div style={{ display: 'flex', gap: '2px' }}>
+    {[1, 2, 3, 4, 5].map((star) => (
+      <span
+        key={star}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleRatingChange(book.id, star === book.rating ? 0 : star); // click same star again to clear
+        }}
+        style={{
+          cursor: 'pointer',
+          fontSize: '16px',
+          color: star <= (book.rating || 0) ? '#f59e0b' : '#3f3f46',
+          lineHeight: 1,
+          transition: 'color 0.1s',
+        }}
+        onMouseEnter={(e) => {
+          if (star > (book.rating || 0)) e.currentTarget.style.color = '#71717a';
+        }}
+        onMouseLeave={(e) => {
+          if (star > (book.rating || 0)) e.currentTarget.style.color = '#3f3f46';
+        }}
+      >
+        ★
+      </span>
+    ))}
+  </div>
+</td>
+
 
                     {/* Actions */}
                     <td style={{ ...cellStyle, textAlign: 'right' }}>

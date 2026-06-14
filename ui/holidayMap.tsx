@@ -1,10 +1,11 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// Fix default marker icon
+// Default marker icon
 const icon = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -13,6 +14,23 @@ const icon = L.icon({
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41],
+});
+
+// Blue dot icon for user location
+const userIcon = L.divIcon({
+  className: 'user-location-marker',
+  html: `
+    <div style="
+      width: 16px;
+      height: 16px;
+      background: #2563eb;
+      border: 3px solid white;
+      border-radius: 50%;
+      box-shadow: 0 0 0 4px rgba(37,99,235,0.3), 0 2px 6px rgba(0,0,0,0.3);
+    "></div>
+  `,
+  iconSize: [16, 16],
+  iconAnchor: [8, 8],
 });
 
 type Pin = {
@@ -33,6 +51,17 @@ function ClickHandler({ onMapClick }: { onMapClick: (lat: number, lng: number) =
   return null;
 }
 
+// Flies the map to the user's location once found
+function FlyToUser({ position }: { position: [number, number] | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (position) {
+      map.flyTo(position, 6, { duration: 1.5 });
+    }
+  }, [position, map]);
+  return null;
+}
+
 export default function HolidayMap({
   pins,
   onMapClick,
@@ -42,52 +71,142 @@ export default function HolidayMap({
   onMapClick: (lat: number, lng: number) => void;
   onDelete: (id: string) => void;
 }) {
-  return (
-    <MapContainer center={[20, 0]} zoom={2} style={{ height: '100%', width: '100%' }}>
-      <TileLayer
-        attribution='&copy; OpenStreetMap contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <ClickHandler onMapClick={onMapClick} />
+  const [userPosition, setUserPosition] = useState<[number, number] | null>(null);
+  const [locationStatus, setLocationStatus] = useState<'idle' | 'requesting' | 'granted' | 'denied'>('idle');
 
-      {pins.map((pin) => (
-        <Marker key={pin.id} position={[pin.lat, pin.lng]} icon={icon}>
-          <Popup>
-            <div style={{ minWidth: '180px' }}>
-              {pin.photo && (
-                <img
-                  src={pin.photo}
-                  alt={pin.name}
-                  style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px', marginBottom: '8px' }}
-                />
-              )}
-              <h4 style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '700' }}>
-                {pin.name}
-              </h4>
-              {pin.notes && (
-                <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#71717a' }}>
-                  {pin.notes}
-                </p>
-              )}
-              <button
-                onClick={() => onDelete(pin.id)}
-                style={{
-                  backgroundColor: '#fee2e2',
-                  color: '#ef4444',
-                  border: 'none',
-                  borderRadius: '6px',
-                  padding: '4px 10px',
-                  fontSize: '11px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                }}
-              >
-                🗑️ Remove
-              </button>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
-    </MapContainer>
+  useEffect(() => {
+    if (!('geolocation' in navigator)) {
+      setLocationStatus('denied');
+      return;
+    }
+
+    setLocationStatus('requesting');
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserPosition([pos.coords.latitude, pos.coords.longitude]);
+        setLocationStatus('granted');
+      },
+      (err) => {
+        console.error('❌ Location error:', err.message);
+        setLocationStatus('denied');
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }, []);
+
+  return (
+    <div style={{ position: 'relative', height: '100%', width: '100%' }}>
+      <MapContainer
+        center={[20, 0]}
+        zoom={2}
+        minZoom={2}
+        maxBounds={[[-90, -180], [90, 180]]}
+        maxBoundsViscosity={1.0}
+        worldCopyJump={false}
+        style={{ height: '100%', width: '100%' }}
+      >
+        <TileLayer
+          attribution='&copy; OpenStreetMap contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          noWrap={true}
+        />
+        <ClickHandler onMapClick={onMapClick} />
+        <FlyToUser position={userPosition} />
+
+        {/* User's current location */}
+        {userPosition && (
+          <Marker position={userPosition} icon={userIcon}>
+            <Popup>
+              <div style={{ fontSize: '13px', fontWeight: '600' }}>📍 You are here</div>
+            </Popup>
+          </Marker>
+        )}
+
+        {/* Saved holiday pins */}
+        {pins.map((pin) => (
+          <Marker key={pin.id} position={[pin.lat, pin.lng]} icon={icon}>
+            <Popup>
+              <div style={{ minWidth: '180px' }}>
+                {pin.photo && (
+                  <img
+                    src={pin.photo}
+                    alt={pin.name}
+                    style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px', marginBottom: '8px' }}
+                  />
+                )}
+                <h4 style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '700' }}>
+                  {pin.name}
+                </h4>
+                {pin.notes && (
+                  <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#71717a' }}>
+                    {pin.notes}
+                  </p>
+                )}
+                <button
+                  onClick={() => onDelete(pin.id)}
+                  style={{
+                    backgroundColor: '#fee2e2',
+                    color: '#ef4444',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '4px 10px',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                  }}
+                >
+                  🗑️ Remove
+                </button>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
+
+      {/* Location permission banner */}
+      {locationStatus === 'requesting' && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '12px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            backgroundColor: 'white',
+            padding: '8px 16px',
+            borderRadius: '10px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            fontSize: '13px',
+            color: '#71717a',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          📍 Requesting your location...
+        </div>
+      )}
+
+      {locationStatus === 'denied' && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '12px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            backgroundColor: 'white',
+            padding: '8px 16px',
+            borderRadius: '10px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            fontSize: '13px',
+            color: '#ef4444',
+            zIndex: 1000,
+          }}
+        >
+          ⚠️ Location access denied or unavailable
+        </div>
+      )}
+    </div>
   );
 }
