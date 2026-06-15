@@ -1,8 +1,8 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/(main)/coffee/page": "app/(main)/coffee/page.js",
-  "/(main)/gallery/page": "app/(main)/gallery/page.js",
+  "/(main)/home/page": "app/(main)/home/page.js",
   "/(main)/notes/page": "app/(main)/notes/page.js",
-  "/(main)/wishlist/page": "app/(main)/wishlist/page.js",
-  "/(main)/holiday/page": "app/(main)/holiday/page.js"
+  "/(main)/gallery/page": "app/(main)/gallery/page.js",
+  "/(main)/poetry/page": "app/(main)/poetry/page.js",
+  "/(main)/coffee/page": "app/(main)/coffee/page.js"
 }

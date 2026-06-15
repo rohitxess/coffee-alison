@@ -3,6 +3,9 @@
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSidebar } from '@/lib/sidebar-context';
+import { use, useState, useEffect } from 'react';
+import {db} from '@/lib/firebase';
+import {doc, onSnapshot} from 'firebase/firestore';
 
 type NavLink = {
   label: string;
@@ -136,6 +139,25 @@ export function Sidebar() {
   const router            = useRouter();
   const { open, setOpen } = useSidebar();
 
+  // add state and fetch prfile data
+
+  const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [profileName, setProfileName] = useState('Alison Lu');
+
+    // ← Fetch profile data live
+    useEffect(() => {
+      const docRef = doc(db, 'profile', 'main-profile');
+      const unsubscribe = onSnapshot(docRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          setProfilePic(data.profileImage || null);
+          const fullName = `${data.firstName || ''} ${data.lastName || ''}`.trim();
+          setProfileName(fullName || 'Alison Smith');
+        }
+      });
+      return () => unsubscribe();
+    }, []);
+
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
     router.push('/');
@@ -189,22 +211,95 @@ export function Sidebar() {
         )}
       </button>
 
-      {/* Logo */}
-      {open && (
-        <div
-          style={{
-            color: 'white',
-            fontWeight: '800',
-            fontSize: '16px',
-            padding: '8px 12px',
-            marginBottom: '16px',
-            borderBottom: '1px solid #27272a',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          Alison Lu
-        </div>
-      )}
+        {/* Profile section */}
+        {open ? (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '8px 12px',
+              marginBottom: '16px',
+              borderBottom: '1px solid #27272a',
+            }}
+          >
+            {/* Profile picture */}
+            <div
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',     // ← oval/circle shape
+                overflow: 'hidden',
+                flexShrink: 0,
+                backgroundColor: '#27272a',
+                backgroundImage: profilePic ? `url(${profilePic})` : 'none',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '1.5px solid #3f3f46',
+              }}
+            >
+              {!profilePic && (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              )}
+            </div>
+
+            {/* Name */}
+            <span
+              style={{
+                color: 'white',
+                fontWeight: '700',
+                fontSize: '14px',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {profileName}
+            </span>
+          </div>
+        ) : (
+          /* Collapsed — just the picture */
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginBottom: '16px',
+              paddingBottom: '16px',
+              borderBottom: '1px solid #27272a',
+            }}
+          >
+            <div
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                overflow: 'hidden',
+                backgroundColor: '#27272a',
+                backgroundImage: profilePic ? `url(${profilePic})` : 'none',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '1.5px solid #3f3f46',
+              }}
+            >
+              {!profilePic && (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              )}
+            </div>
+          </div>
+        )}
+
 
       {/* Nav Links */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>

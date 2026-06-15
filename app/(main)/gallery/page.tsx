@@ -18,6 +18,7 @@ import {
   getDownloadURL,
   deleteObject,
 } from 'firebase/storage';
+import { SkeletonGrid } from '@/ui/skeleton';
 // import heic2any from 'heic2any';
 
 type Photo = {
@@ -36,6 +37,7 @@ export default function GalleryPage() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const inputRef                  = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);  
+  const [loadingPhotos, setLoadingPhotos] = useState(true);
 
   // for keyboard navigation in lightbox
 
@@ -72,6 +74,7 @@ export default function GalleryPage() {
         ...d.data(),
       })) as Photo[];
       setPhotos(data);
+      setLoadingPhotos(false);  // ← data arrived
     });
     return () => unsubscribe();
   }, []);
