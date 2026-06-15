@@ -1,8 +1,7 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/(main)/home/page": "app/(main)/home/page.js",
-  "/(main)/notes/page": "app/(main)/notes/page.js",
-  "/(main)/gallery/page": "app/(main)/gallery/page.js",
   "/(main)/poetry/page": "app/(main)/poetry/page.js",
-  "/(main)/coffee/page": "app/(main)/coffee/page.js"
+  "/(main)/notes/page": "app/(main)/notes/page.js",
+  "/(main)/music/page": "app/(main)/music/page.js",
+  "/(main)/movies/page": "app/(main)/movies/page.js",
+  "/(main)/books/page": "app/(main)/books/page.js"
 }
