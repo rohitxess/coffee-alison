@@ -6,6 +6,7 @@ import { useSidebar } from '@/lib/sidebar-context';
 import { use, useState, useEffect } from 'react';
 import {db} from '@/lib/firebase';
 import {doc, onSnapshot} from 'firebase/firestore';
+import { Toggle } from '@/ui/toggle';
 
 type NavLink = {
   label: string;
@@ -181,36 +182,12 @@ export function Sidebar() {
       }}
     >
       {/* Toggle Button */}
-      <button
-        onClick={() => setOpen(!open)}
-        style={{
-          backgroundColor: '#18181b',
-          border: '1px solid #27272a',
-          borderRadius: '8px',
-          padding: '8px',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: '16px',
-          color: 'white',
-          width: '36px',
-          alignSelf: open ? 'flex-end' : 'center',
-          transition: 'all 0.25s ease',
-          flexShrink: 0,
-        }}
-      >
-        {open ? (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6"/>
-          </svg>
-        ) : (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 18 15 12 9 6"/>
-          </svg>
-        )}
-      </button>
-
+      <Toggle
+        isOpen={open}
+        onToggle={() => setOpen(!open)}
+        style={{ alignSelf: open ? 'flex-end' : 'center', marginBottom: '16px' }}
+      />
+      
         {/* Profile section */}
         {open ? (
           <div

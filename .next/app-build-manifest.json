@@ -17,40 +17,60 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/(main)/poetry/page": [
+    "/(main)/coffee/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(main)/poetry/page.js"
+      "static/chunks/app/(main)/coffee/page.js"
     ],
     "/(main)/movies/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(main)/movies/page.js"
     ],
-    "/(main)/books/page": [
+    "/(main)/music/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(main)/books/page.js"
+      "static/chunks/app/(main)/music/page.js"
     ],
-    "/(main)/notes/page": [
+    "/(main)/wishlist/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(main)/notes/page.js"
+      "static/chunks/app/(main)/wishlist/page.js"
+    ],
+    "/(main)/holiday/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(main)/holiday/page.js"
     ],
     "/(main)/gallery/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(main)/gallery/page.js"
     ],
-    "/(main)/coffee/page": [
+    "/(main)/notes/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(main)/coffee/page.js"
+      "static/chunks/app/(main)/notes/page.js"
     ],
-    "/(main)/music/page": [
+    "/(main)/profile/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(main)/music/page.js"
+      "static/chunks/app/(main)/profile/page.js"
+    ],
+    "/(main)/books/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(main)/books/page.js"
+    ],
+    "/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/page.js"
+    ],
+    "/(main)/poetry/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(main)/poetry/page.js"
     ]
   }
 }

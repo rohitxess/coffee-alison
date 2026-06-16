@@ -13,6 +13,7 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 import { SkeletonList } from '@/ui/skeleton';
+import { Toggle } from '@/ui/toggle';
 
 type Song = {
   id: string;
@@ -47,6 +48,7 @@ export default function MusicPage() {
   const [mounted, setMounted]     = useState(false);
   const [loading, setLoading]     = useState(true);
   const [search, setSearch]       = useState('');
+  const [playlistOpen, setPlaylistOpen] = useState(true);
 
   const [activePlaylist, setActivePlaylist] = useState<string>('all');
   const [nowPlaying, setNowPlaying] = useState<Song | null>(null);
@@ -161,10 +163,11 @@ export default function MusicPage() {
         overflow: 'hidden',
       }}
     >
+
       {/* ── Left Sidebar — Playlists ── */}
       <div
         style={{
-          width: '220px',
+          width: playlistOpen ? '220px' : '60px',
           flexShrink: 0,
           backgroundColor: 'white',
           borderRight: '1px solid #e4e4e7',
@@ -172,11 +175,27 @@ export default function MusicPage() {
           flexDirection: 'column',
           padding: '20px 12px',
           overflowY: 'auto',
+          overflowX: 'hidden',
+          transition: 'width 0.25s ease',
         }}
       >
-        <h2 style={{ fontSize: '13px', fontWeight: '700', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 12px 12px' }}>
+        {/* <h2 style={{ fontSize: '13px', fontWeight: '700', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 12px 12px' }}>
           Playlists
-        </h2>
+        </h2> */}
+
+        {/* Playlists Sidebar Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', padding: '0 4px' }}>
+          {playlistOpen && (
+            <h2 style={{ fontSize: '13px', fontWeight: '700', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>
+              Playlists
+            </h2>
+          )}
+          <Toggle
+            isOpen={playlistOpen}
+            onToggle={() => setPlaylistOpen(!playlistOpen)}
+            style={{ marginLeft: playlistOpen ? 'auto' : '0' }}
+          />
+        </div>
 
         {/* All Songs */}
         <button
@@ -197,14 +216,16 @@ export default function MusicPage() {
             marginBottom: '2px',
           }}
         >
-          🎵 All Songs
-          <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#a1a1aa', fontWeight: '500' }}>
-            {songs.length}
-          </span>
+          🎵 {playlistOpen && 'All Songs'}
+          {playlistOpen && (
+            <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#a1a1aa' }}>
+              {songs.length}
+            </span>
+          )}
         </button>
 
         {/* Playlists */}
-        {playlists.map((playlist) => {
+        {playlistOpen && playlists.map((playlist) => {
           const count = songs.filter((s) => s.playlistId === playlist.id).length;
           return (
             <div
@@ -243,7 +264,7 @@ export default function MusicPage() {
                   overflow: 'hidden',
                 }}
               >
-                📁 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{playlist.name}</span>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{playlist.name}</span>
                 <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#a1a1aa', fontWeight: '500', flexShrink: 0 }}>
                   {count}
                 </span>
@@ -273,7 +294,8 @@ export default function MusicPage() {
         })}
 
         {/* New Playlist */}
-        <button
+      {playlistOpen && (
+          <button
           onClick={() => setShowAddPlaylist(true)}
           style={{
             display: 'flex',
@@ -298,6 +320,7 @@ export default function MusicPage() {
           </svg>
           New Playlist
         </button>
+      )}
       </div>
 
       {/* ── Main Content ── */}
@@ -487,7 +510,8 @@ export default function MusicPage() {
           {/* Player Panel */}
           <div
             style={{
-              width: '380px',
+              width: '450px',
+              height: '600px',   //review this line of code
               flexShrink: 0,
               backgroundColor: 'white',
               borderLeft: '1px solid #e4e4e7',
@@ -512,14 +536,6 @@ export default function MusicPage() {
                 <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#09090b', margin: '0 0 4px 0' }}>
                   {nowPlaying.title}
                 </h3>
-                <a
-                  href={nowPlaying.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ fontSize: '12px', color: '#a1a1aa', textDecoration: 'none' }}
-                >
-                  🔗 Open in YouTube
-                </a>
               </>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '200px', color: '#a1a1aa', gap: '8px', textAlign: 'center' }}>
