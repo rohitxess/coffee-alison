@@ -7,6 +7,7 @@ import { use, useState, useEffect } from 'react';
 import {db} from '@/lib/firebase';
 import {doc, onSnapshot} from 'firebase/firestore';
 import { Toggle } from '@/ui/toggle';
+import { FeedbackModal } from '@/ui/feedback-modal';
 
 type NavLink = {
   label: string;
@@ -139,6 +140,7 @@ export function Sidebar() {
   const pathname          = usePathname();
   const router            = useRouter();
   const { open, setOpen } = useSidebar();
+  const [showFeedback, setShowFeedback] = useState(false);  
 
   // add state and fetch prfile data
 
@@ -321,6 +323,45 @@ export function Sidebar() {
           );
         })}
       </div>
+
+
+
+      {/* Feedback Button */}
+        <button
+          onClick={() => setShowFeedback(true)}
+          title={!open ? 'Feedback' : ''}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '10px 12px',
+            borderRadius: '8px',
+            color: '#71717a',
+            backgroundColor: 'transparent',
+            border: 'none',
+            fontSize: '14px',
+            fontWeight: '500',
+            cursor: 'pointer',
+            width: '100%',
+            transition: 'all 0.15s',
+            justifyContent: open ? 'flex-start' : 'center',
+            whiteSpace: 'nowrap',
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#18181b'; e.currentTarget.style.color = 'white'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#71717a'; }}
+        >
+          <span style={{ flexShrink: 0 }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </span>
+          {open && <span>Feedback</span>}
+        </button>
+
+        {/* Feedback Modal */}
+        {showFeedback && (
+          <FeedbackModal onClose={() => setShowFeedback(false)} />
+        )}
 
       {/* Logout Button */}
       <button
