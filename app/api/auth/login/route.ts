@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 // Hardcoded user for now — replace with Firebase Auth later
 const MOCK_USER = {
   email: 'alison@coffee.com',
-  passwordHash: '$2b$10$H0B8gDAH.ARfHpbnQSPBb.SF3f2oUNkETL8a03PrvJflfX8GIv3IG',
+  passwordHash: '$2b$10$iGmSNXtiUXgIENGI1b8//OLZ7fsHLppfk7SUtQVZrsSUqeD65t2Nu',
 };
 
 export async function POST(req: Request) {

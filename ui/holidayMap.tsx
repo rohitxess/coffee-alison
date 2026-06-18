@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
+import { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// Default marker icon
+// Fix default marker icon
 const icon = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -16,7 +16,6 @@ const icon = L.icon({
   shadowSize: [41, 41],
 });
 
-// Blue dot icon for user location
 const userIcon = L.divIcon({
   className: 'user-location-marker',
   html: `
@@ -51,8 +50,8 @@ function ClickHandler({ onMapClick }: { onMapClick: (lat: number, lng: number) =
   return null;
 }
 
-// Flies the map to the user's location once found
 function FlyToUser({ position }: { position: [number, number] | null }) {
+  const { useMap } = require('react-leaflet');
   const map = useMap();
   useEffect(() => {
     if (position) {
@@ -73,31 +72,46 @@ export default function HolidayMap({
 }) {
   const [userPosition, setUserPosition] = useState<[number, number] | null>(null);
   const [locationStatus, setLocationStatus] = useState<'idle' | 'requesting' | 'granted' | 'denied'>('idle');
+  const [mapKey, setMapKey] = useState(0); // ← key forces fresh map instance
 
   useEffect(() => {
+    // ← Force new map instance on mount to prevent "already initialized"
+    setMapKey((prev) => prev + 1);
+
     if (!('geolocation' in navigator)) {
       setLocationStatus('denied');
       return;
     }
 
     setLocationStatus('requesting');
-
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setUserPosition([pos.coords.latitude, pos.coords.longitude]);
         setLocationStatus('granted');
       },
       (err) => {
-        console.error('❌ Location error:', err.message);
+        console.error('Location error:', err.message);
         setLocationStatus('denied');
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
+
+    // ← Cleanup Leaflet map on unmount to prevent reinitialization
+    return () => {
+      const containers = document.querySelectorAll('.leaflet-container');
+      containers.forEach((container: any) => {
+        if (container._leaflet_id) {
+          container._leaflet_id = null;
+        }
+      });
+    };
   }, []);
 
   return (
     <div style={{ position: 'relative', height: '100%', width: '100%' }}>
+      {/* ← key prop forces complete remount of MapContainer */}
       <MapContainer
+        key={mapKey}
         center={[20, 0]}
         zoom={2}
         minZoom={2}
@@ -112,9 +126,7 @@ export default function HolidayMap({
           noWrap={true}
         />
         <ClickHandler onMapClick={onMapClick} />
-        <FlyToUser position={userPosition} />
 
-        {/* User's current location */}
         {userPosition && (
           <Marker position={userPosition} icon={userIcon}>
             <Popup>
@@ -123,7 +135,6 @@ export default function HolidayMap({
           </Marker>
         )}
 
-        {/* Saved holiday pins */}
         {pins.map((pin) => (
           <Marker key={pin.id} position={[pin.lat, pin.lng]} icon={icon}>
             <Popup>
@@ -164,47 +175,15 @@ export default function HolidayMap({
         ))}
       </MapContainer>
 
-      {/* Location permission banner */}
+      {/* Location status banners */}
       {locationStatus === 'requesting' && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '12px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            backgroundColor: 'white',
-            padding: '8px 16px',
-            borderRadius: '10px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            fontSize: '13px',
-            color: '#71717a',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}
-        >
+        <div style={{ position: 'absolute', top: '12px', left: '50%', transform: 'translateX(-50%)', backgroundColor: 'white', padding: '8px 16px', borderRadius: '10px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', fontSize: '13px', color: '#71717a', zIndex: 1000 }}>
           📍 Requesting your location...
         </div>
       )}
-
       {locationStatus === 'denied' && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '12px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            backgroundColor: 'white',
-            padding: '8px 16px',
-            borderRadius: '10px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            fontSize: '13px',
-            color: '#ef4444',
-            zIndex: 1000,
-          }}
-        >
-          ⚠️ Location access denied or unavailable
+        <div style={{ position: 'absolute', top: '12px', left: '50%', transform: 'translateX(-50%)', backgroundColor: 'white', padding: '8px 16px', borderRadius: '10px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', fontSize: '13px', color: '#ef4444', zIndex: 1000 }}>
+          ⚠️ Location access denied
         </div>
       )}
     </div>
