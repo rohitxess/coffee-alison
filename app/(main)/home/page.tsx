@@ -14,11 +14,11 @@ import {
 } from 'firebase/firestore';
 
 const cards = [
-  { emoji: '☕', title: 'Coffee this week?',  desc: 'Let Alison know if you want coffee!',  color: '#fef3c7', border: '#f59e0b' },
-  { emoji: '📅', title: 'Last meetup',        desc: 'You last had coffee 3 days ago.',       color: '#ede9fe', border: '#8b5cf6' },
-  { emoji: '💬', title: 'Responses',          desc: 'You have responded 5 times so far.',    color: '#dcfce7', border: '#22c55e' },
-  { emoji: '❤️', title: 'Made with love',     desc: 'This app was made just for you!',       color: '#ffe4e6', border: '#f43f5e' },
-  { emoji: '❤️', title: 'Dont make her mad!',     desc: 'Pickup her call!',                 color: '#99B0B0', border: '#99B0B0' },
+  { emoji: '☕', title: 'Coffee this week?',  desc: 'Let Alison know if you want coffee!',  color: '#EFF6FF', border: '#2563EB' },
+  { emoji: '📅', title: 'Last meetup',        desc: 'You last had coffee 3 days ago.',       color: '#ECFDF5', border: '#10B981' },
+  { emoji: '💬', title: 'Responses',          desc: 'You have responded 5 times so far.',    color: '#F5F3FF', border: '#7C3AED' },
+  { emoji: '😆', title: 'Made with an intention',     desc: 'Intention of getting a salary increment!',       color: '#FFF7ED', border: '#EA580C' },
+  { emoji: '🤐', title: 'Dont make her mad!',     desc: 'Pickup her call! and respond to her texts',                 color: '#FDF2F8', border: '#DB2777' },
 ];
 
 const EVENT_COLORS = [
