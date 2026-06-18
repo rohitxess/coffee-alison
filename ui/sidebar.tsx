@@ -121,20 +121,7 @@ const LogoutIcon = () => (
   </svg>
 );
 
-const navLinks: NavLink[] = [
-  { label: 'Home',     href: '/home',   icon: <HomeIcon />    },
-  { label: 'Coffee',   href: '/coffee', icon: <CoffeeIcon />  },
-  { label: 'Notes',    href: '/notes',  icon: <NotesIcon />   },
-  { label: 'Poetry',   href: '/poetry',  icon: <PoetryIcon />   },
-  { label: 'Reading List',   href: '/books',  icon: <ReadingIcon />},
-  { label: 'Movies',  href: '/movies', icon: <MoviesIcon /> },
-  { label: 'Music',  href: '/music', icon: <MusicIcon /> },
-  { label: 'Gallery',  href: '/gallery', icon: <GalleryIcon /> },
-  { label: 'Wishlist', href: '/wishlist', icon: <WishlistIcon /> },
-  { label: 'Holiday', href: '/holiday', icon: <HolidayIcon /> },
-  { label: 'Profile',  href: '/profile', icon: <ProfileIcon /> },
-  { label: 'Settings', href: '/settings', icon: <SettingsIcon />},
-];
+
 
 export function Sidebar() {
   const pathname          = usePathname();
@@ -146,6 +133,22 @@ export function Sidebar() {
 
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [profileName, setProfileName] = useState('Alison Lu');
+
+  const navLinks: NavLink[] = [
+    { label: 'Home',     href: '/home',   icon: <HomeIcon />    },
+    { label: 'Coffee',   href: '/coffee', icon: <CoffeeIcon />  },
+    { label: 'Notes',    href: '/notes',  icon: <NotesIcon />   },
+    { label: 'Poetry',   href: '/poetry',  icon: <PoetryIcon />   },
+    { label: 'Reading List',   href: '/books',  icon: <ReadingIcon />},
+    { label: 'Movies',  href: '/movies', icon: <MoviesIcon /> },
+    { label: 'Music',  href: '/music', icon: <MusicIcon /> },
+    { label: 'Gallery',  href: '/gallery', icon: <GalleryIcon /> },
+    { label: 'Wishlist', href: '/wishlist', icon: <WishlistIcon /> },
+    { label: 'Holiday', href: '/holiday', icon: <HolidayIcon /> },
+    { label: 'Profile',  href: '/profile', icon: <ProfileIcon /> },
+    { label: 'Settings', href: '/settings', icon: <SettingsIcon />},
+  ];
+
 
     // ← Fetch profile data live
     useEffect(() => {
