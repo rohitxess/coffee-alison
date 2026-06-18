@@ -109,22 +109,31 @@ export default function HolidayMap({
 
   return (
     <div style={{ position: 'relative', height: '100%', width: '100%' }}>
-      {/* ← key prop forces complete remount of MapContainer */}
-      <MapContainer
-        key={mapKey}
-        center={[20, 0]}
-        zoom={2}
-        minZoom={2}
-        maxBounds={[[-90, -180], [90, 180]]}
-        maxBoundsViscosity={1.0}
-        worldCopyJump={false}
-        style={{ height: '100%', width: '100%' }}
-      >
-        <TileLayer
+     
+            <MapContainer
+          key={mapKey}
+          center={[20, 0]}
+          zoom={2}
+          minZoom={2}
+          maxZoom={18}
+          maxBounds={[[-85, -180], [85, 180]]}  // ← use 85 not 90 (avoids invalid tiles)
+          maxBoundsViscosity={1.0}
+          worldCopyJump={false}
+          style={{ height: '100%', width: '100%' }}
+        >
+          <TileLayer
+            attribution='&copy; OpenStreetMap contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            noWrap={true}
+            bounds={[[-85, -180], [85, 180]]}  // ← add bounds to TileLayer too
+            minZoom={2}
+            maxZoom={18}
+          />
+        {/* <TileLayer
           attribution='&copy; OpenStreetMap contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           noWrap={true}
-        />
+        /> */}
         <ClickHandler onMapClick={onMapClick} />
 
         {userPosition && (
