@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
+  //logs
   return NextResponse.json({
     hasJwtSecret:      !!process.env.JWT_SECRET,
     hasFirebaseKey:    !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
