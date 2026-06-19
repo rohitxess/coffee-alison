@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
+import { compare } from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { loginSchema } from '@/lib/validation';
 
 const MOCK_USER = {
   email: 'alison@coffee.com.au',
-  passwordHash:'$2b$10$iGmSNXtiUXgIENGI1b8//OLZ7fsHLppfk7SUtQVZrsSUqeD65t2Nu',
+  passwordHash:'$2b$10$K2t/ttPTC0SkDPJoDxGQEeG.y/emPSUh/pRPJU26VBmfL2T2o0ATy',
 };
 
 export async function POST(req: Request) {
@@ -42,7 +43,8 @@ export async function POST(req: Request) {
       );
     }
 
-    const passwordMatch = await bcrypt.compare(password, MOCK_USER.passwordHash);
+    const passwordMatch = await compare(password, MOCK_USER.passwordHash);
+
     console.log('Password match:', passwordMatch);
 
     if (!passwordMatch) {
