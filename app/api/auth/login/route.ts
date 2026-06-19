@@ -14,7 +14,15 @@ export async function POST(req: Request) {
     console.log('JWT_SECRET exists:', !!process.env.JWT_SECRET);
 
     const body = await req.json();
+    const {email, password} = body;
     console.log('Email');
+
+    if (!email || !password) {
+      return NextResponse.json(
+        { success: false, errors: { general: ['Email and password required'] } },
+        { status: 400 }
+      );
+    }    
 
     const result = loginSchema.safeParse(body);
     if (!result.success) {
@@ -25,7 +33,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { email, password } = result.data;
+    // const { email, password } = result.data;
 
     if (email !== MOCK_USER.email) {
       return NextResponse.json(
@@ -35,7 +43,7 @@ export async function POST(req: Request) {
     }
 
     const passwordMatch = await bcrypt.compare(password, MOCK_USER.passwordHash);
-    console.log('🔑 Password match:', passwordMatch);
+    console.log('Password match:', passwordMatch);
 
     if (!passwordMatch) {
       return NextResponse.json(
