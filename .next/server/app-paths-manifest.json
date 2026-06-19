@@ -1,9 +1,6 @@
 {
-  "/api/auth/login/route": "app/api/auth/login/route.js",
-  "/page": "app/page.js",
-  "/(main)/holiday/page": "app/(main)/holiday/page.js",
-  "/(main)/coffee/page": "app/(main)/coffee/page.js",
   "/(main)/home/page": "app/(main)/home/page.js",
-  "/(main)/gallery/page": "app/(main)/gallery/page.js",
-  "/(main)/movies/page": "app/(main)/movies/page.js"
+  "/(main)/profile/page": "app/(main)/profile/page.js",
+  "/(main)/holiday/page": "app/(main)/holiday/page.js",
+  "/(main)/gallery/page": "app/(main)/gallery/page.js"
 }
