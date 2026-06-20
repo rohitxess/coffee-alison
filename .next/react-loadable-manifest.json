@@ -4,5 +4,12 @@
     "files": [
       "static/chunks/_app-pages-browser_node_modules_heic2any_dist_heic2any_js.js"
     ]
+  },
+  "app/(main)/holiday/page.tsx -> @/ui/holidayMap": {
+    "id": "app/(main)/holiday/page.tsx -> @/ui/holidayMap",
+    "files": [
+      "static/css/_app-pages-browser_ui_holidayMap_tsx.css",
+      "static/chunks/_app-pages-browser_ui_holidayMap_tsx.js"
+    ]
   }
 }
